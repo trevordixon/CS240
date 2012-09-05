@@ -31,8 +31,8 @@ public class Pixel {
 	public Pixel emboss(Pixel p) {
 		int v = 128 + absMax(
 			red - p.red,
-			blue - p.blue,
-			green - p.green
+			green - p.green,
+			blue - p.blue
 		);
 		
 		if (v > 255) v = 255;
