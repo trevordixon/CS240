@@ -63,10 +63,14 @@ public class Pixel {
 			b = 0;
 		
 		for (Pixel p : pixels) {
-			r += p.red / pixels.length;
-			g += p.green / pixels.length;
-			b += p.blue / pixels.length;
+			r += p.red;
+			g += p.green;
+			b += p.blue;
 		}
+		
+		r = r / pixels.length;
+		g = b / pixels.length;
+		b = b / pixels.length;
 		
 		return new Pixel(r, g, b);
 	}
