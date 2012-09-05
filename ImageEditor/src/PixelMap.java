@@ -127,7 +127,7 @@ public class PixelMap {
 	}
 	
 	private boolean isChar(char c) {
-		return (c != '#' && c != '\n' && c != '\t' && c != ' ');
+		return (c != '#' && c != '\n' && c != '\r' && c != '\t' && c != ' ');
 	}
 	
 	private boolean isChar(int c) {
