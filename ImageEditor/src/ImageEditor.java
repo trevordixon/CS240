@@ -62,10 +62,10 @@ public class ImageEditor {
 	public static void main(String[] args) {
 //		if (args.length == 0) {
 //			String[] _args = {
-//				"/Users/tdixon/Documents/CS240/ImageEditor/src/nocomments.ppm",
-//				"/Users/tdixon/Documents/CS240/ImageEditor/src/blurry.ppm",
-//				"motionblur",
-//				"1"
+//				"/Users/tdixon/Documents/CS240/ImageEditor/src/tiny.ppm",
+//				"/Users/tdixon/Documents/CS240/ImageEditor/src/newtiney.ppm",
+//				"invert"
+//				//"1"
 //			};
 //			
 //			args = _args;
@@ -83,7 +83,7 @@ public class ImageEditor {
 			if (command.equals(Command.MOTIONBLUR)) {
 				blurRadius = Integer.parseInt(args[3]);
 				if (blurRadius <= 0)
-					printError("motionblur-length must be greater than 0.");
+					printUsage();
 			}
 		} catch (Exception e) {
 			printUsage();
@@ -94,7 +94,7 @@ public class ImageEditor {
 		try {
 			pixelMap = new PixelMap(in);
 		} catch (Exception e) {
-			printError(e.getMessage());
+			printUsage();
 			return;
 		}
 		
@@ -130,7 +130,7 @@ public class ImageEditor {
 	}
 	
 	public static void printUsage() {
-		System.out.println("USAGE: java ImageEditor  in-file out-file (grayscale|invert|emboss|motionblur motionblur-length)");
+		System.out.println("USAGE: java ImageEditor  in-file out-file (grayscale|invert|emboss|motionblur motion-blur-length)");
 	}
 	
 	public static void printError(String err) {
