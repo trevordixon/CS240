@@ -60,16 +60,16 @@ public class ImageEditor {
 	}
 	
 	public static void main(String[] args) {
-		if (args.length == 0) {
-			String[] _args = {
-				"/Users/tdixon/Documents/CS240/ImageEditor/src/pic.ppm",
-				"/Users/tdixon/Documents/CS240/ImageEditor/src/blurry.ppm",
-				"motionblur",
-				"7"
-			};
-			
-			args = _args;
-		}
+//		if (args.length == 0) {
+//			String[] _args = {
+//				"/Users/tdixon/Documents/CS240/ImageEditor/src/pic.ppm",
+//				"/Users/tdixon/Documents/CS240/ImageEditor/src/blurry.ppm",
+//				"motionblur",
+//				"7"
+//			};
+//			
+//			args = _args;
+//		}
 		
 		String in, out;
 		Command command;
