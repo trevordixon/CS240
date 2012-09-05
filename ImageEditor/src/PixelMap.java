@@ -20,7 +20,7 @@ public class PixelMap {
 		try {
 			stream = new PushbackReader(new FileReader(path));
 		} catch (Exception e) {
-			throw new Error("File not found.");
+			throw new Exception("File not found.");
 		}
 		
 		try {
