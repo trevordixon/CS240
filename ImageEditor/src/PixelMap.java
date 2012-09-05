@@ -1,5 +1,3 @@
-package imageEditor;
-
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -15,6 +13,12 @@ class Pixel {
 		green = g;
 		blue = b;
 	}
+
+	public Pixel(int v) {
+		red = v;
+		green = v;
+		blue = v;
+	}
 	
 	public Pixel invert() {
 		return invert(255);
@@ -25,12 +29,51 @@ class Pixel {
 	}
 	
 	public Pixel grayscale() {
-		int c = (red + green + blue) / 3;
-		return new Pixel(c, c, c);
+		int v = (red + green + blue) / 3;
+		return new Pixel(v);
+	}
+	
+	public Pixel emboss(Pixel p) {
+		int v = 128 + absMax(
+			red - p.red,
+			blue - p.blue,
+			green - p.green
+		);
+		
+		if (v > 255) v = 255;
+		else if (v < 0) v = 0;
+		
+		return new Pixel(v);
 	}
 	
 	public String toString() {
 		return red + " " + green + " " + blue + " ";
+	}
+	
+	public static int absMax(int...vals) {
+		int max = 0;
+		
+		for (int v : vals) {
+			if (Math.abs(v) > Math.abs(max)) {
+				max = v;
+			}
+		}
+		
+		return max;
+	}
+	
+	public static Pixel average(Pixel...pixels) {
+		int r = 0,
+			g = 0,
+			b = 0;
+		
+		for (Pixel p : pixels) {
+			r += p.red / pixels.length;
+			g += p.green / pixels.length;
+			b += p.blue / pixels.length;
+		}
+		
+		return new Pixel(r, g, b);
 	}
 }
 
@@ -59,8 +102,7 @@ public class PixelMap {
 			pixels = new Pixel[height][width];
 			readPixels();
 		} catch (Exception e) {
-			throw e;
-			//throw new Exception("File format not recognized.");
+			throw new Exception("File format not recognized.");
 		}
 	}
 	
@@ -71,6 +113,17 @@ public class PixelMap {
 	public PixelMap set(int r, int c, Pixel p) {
 		pixels[r][c] = p;
 		return this;
+	}
+	
+	public Pixel[] get(int r, int c1, int c2) {
+		if (c2 >= pixels[r].length) c2 = pixels[r].length - 1;
+		Pixel[] _pixels = new Pixel[c2 - c1 + 1];
+		
+		for (int i = 0; c1 <= c2; i++, c1++) {
+			_pixels[i] = get(r, c1);
+		}
+		
+		return _pixels;
 	}
 	
 	private PixelMap readHeader() throws Exception {
@@ -163,12 +216,11 @@ public class PixelMap {
 		FileWriter w = new FileWriter(path);
 		
 		String header = "P3\n" + width + " " + height + "\n" + maxColorValue + "\n";
-		w.write(header, 0, header.length());
+		w.write(header);
 		
 		for (Pixel[] row : pixels) {
 			for (Pixel p : row) {
-				String out = p.toString();
-				w.write(out, 0, out.length());
+				w.write(p.toString());
 			}
 			
 			w.write('\n');
