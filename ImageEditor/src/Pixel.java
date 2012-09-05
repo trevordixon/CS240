@@ -69,7 +69,7 @@ public class Pixel {
 		}
 		
 		r = r / pixels.length;
-		g = b / pixels.length;
+		g = g / pixels.length;
 		b = b / pixels.length;
 		
 		return new Pixel(r, g, b);
