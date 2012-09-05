@@ -118,12 +118,14 @@ public class ImageEditor {
 			}
 		} catch (Exception e) {
 			printError("Unexpected error: " + e.getMessage());
+			return;
 		}
 		
 		try {
 			pixelMap.writeToFile(out);
 		} catch (IOException e) {
 			printError("Error writing to file '" + out + "'");
+			return;
 		}
 	}
 	
