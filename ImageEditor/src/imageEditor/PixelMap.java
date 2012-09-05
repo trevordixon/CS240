@@ -1,6 +1,7 @@
 package imageEditor;
 
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PushbackReader;
 
@@ -21,6 +22,11 @@ class Pixel {
 	
 	public Pixel inverse(int max) {
 		return new Pixel(max-red, max-green, max-blue);
+	}
+	
+	public Pixel grayscale() {
+		int c = (red + green + blue) / 3;
+		return new Pixel(c, c, c);
 	}
 	
 	public String toString() {
@@ -128,16 +134,27 @@ public class PixelMap {
 		return isChar((char) c);
 	}
 	
-	public PixelMap clone(PixelMap _pixelMap) {
-		return new PixelMap(_pixelMap.width, _pixelMap.height, _pixelMap.pixels);			
+	public PixelMap clone(PixelMap pixelMap) {
+		return new PixelMap(pixelMap.width, pixelMap.height, pixelMap.pixels);			
 	}
 	
 	public String headerString() {
 		return "P3\n" + width + " " + height + "\n" + maxColorValue + "\n";
 		
-//		for (Pixel p : pixels) {
-//			//out += p.toString();
-//			System.out.println(p);
-//		}
+	}
+	
+	public PixelMap writeToFile(String path) throws IOException {
+		FileWriter w = new FileWriter(path);
+		
+		String header = "P3\n" + width + " " + height + "\n" + maxColorValue + "\n";
+		w.write(header, 0, header.length());
+		
+		for (Pixel p : pixels) {
+			String out = p.toString() + "\n";
+			w.write(out, 0, out.length());
+		}
+		
+		w.close();
+		return this;
 	}
 }
