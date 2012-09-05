@@ -60,6 +60,8 @@ public class PixelMap {
 	}
 	
 	private PixelMap readMagicNumber() throws Exception {
+		skipSeparator();
+		
 		if (!readWord().equals("P3")) {
 			throw new Exception("File format not recognized.");
 		}
