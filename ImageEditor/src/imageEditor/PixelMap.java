@@ -16,11 +16,11 @@ class Pixel {
 		blue = b;
 	}
 	
-	public Pixel inverse() {
-		return inverse(255);
+	public Pixel invert() {
+		return invert(255);
 	}
 	
-	public Pixel inverse(int max) {
+	public Pixel invert(int max) {
 		return new Pixel(max-red, max-green, max-blue);
 	}
 	
@@ -38,10 +38,10 @@ public class PixelMap {
 	public int width;
 	public int height;
 	public int maxColorValue = 255;
-	public Pixel[] pixels;
+	public Pixel[][] pixels;
 	private PushbackReader stream;
 	
-	public PixelMap(int width, int height, Pixel[] pixels) {
+	public PixelMap(int width, int height, Pixel[][] pixels) {
 		this.width = width;
 		this.height = height;
 		this.pixels = pixels;
@@ -56,11 +56,21 @@ public class PixelMap {
 		
 		try {
 			readHeader();
-			pixels = new Pixel[width*height];
+			pixels = new Pixel[height][width];
 			readPixels();
 		} catch (Exception e) {
-			throw new Exception("File format not recognized.");
+			throw e;
+			//throw new Exception("File format not recognized.");
 		}
+	}
+	
+	public Pixel get(int r, int c) {
+		return pixels[r][c];
+	}
+	
+	public PixelMap set(int r, int c, Pixel p) {
+		pixels[r][c] = p;
+		return this;
 	}
 	
 	private PixelMap readHeader() throws Exception {
@@ -93,17 +103,19 @@ public class PixelMap {
 	}
 	
 	private PixelMap readPixels() throws NumberFormatException, IOException {
-		for (int p = 0; p < width * height; p++) {
-			int r = Integer.parseInt(readWord());
-			skipSeparator();
-
-			int g = Integer.parseInt(readWord());
-			skipSeparator();
-			
-			int b = Integer.parseInt(readWord());
-			skipSeparator();
-			
-			pixels[p] = new Pixel(r, g, b);
+		for (int r = 0; r < height; r++) {
+			for (int c = 0; c < width; c++) {
+				int red = Integer.parseInt(readWord());
+				skipSeparator();
+	
+				int green = Integer.parseInt(readWord());
+				skipSeparator();
+				
+				int blue = Integer.parseInt(readWord());
+				skipSeparator();
+				
+				pixels[r][c] = new Pixel(red, green, blue);
+			}
 		}
 		return this;
 	}
@@ -134,8 +146,12 @@ public class PixelMap {
 		return isChar((char) c);
 	}
 	
-	public PixelMap clone(PixelMap pixelMap) {
-		return new PixelMap(pixelMap.width, pixelMap.height, pixelMap.pixels);			
+	public PixelMap clone() {
+		Pixel[][] _pixels = new Pixel[pixels.length][];
+		for (int i = 0; i < pixels.length; i++)
+			_pixels[i] = pixels[i].clone();
+
+		return new PixelMap(width, height, _pixels);			
 	}
 	
 	public String headerString() {
@@ -149,12 +165,26 @@ public class PixelMap {
 		String header = "P3\n" + width + " " + height + "\n" + maxColorValue + "\n";
 		w.write(header, 0, header.length());
 		
-		for (Pixel p : pixels) {
-			String out = p.toString() + "\n";
-			w.write(out, 0, out.length());
+		for (Pixel[] row : pixels) {
+			for (Pixel p : row) {
+				String out = p.toString();
+				w.write(out, 0, out.length());
+			}
+			
+			w.write('\n');
 		}
 		
 		w.close();
+		return this;
+	}
+	
+	public PixelMap forEach(CallBack cb) {
+		for (int r = 0; r < pixels.length; r++) {
+			for (int c = 0; c < pixels[r].length; c++) {
+				cb.handle(this, pixels[r][c], r, c);
+			}
+		}
+	
 		return this;
 	}
 }
