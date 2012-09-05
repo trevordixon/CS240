@@ -48,7 +48,7 @@ public class ImageEditor {
 
 		pixelMap.forEach(new CallBack() {
 			public void handle(PixelMap pixelMap, Pixel p, int r, int c) {
-				pixelMap.set(r, c, Pixel.average(pixelMap.get(r, c, c + radius)));
+				pixelMap.set(r, c, Pixel.average(pixelMap.get(r, c, c + radius - 1)));
 			}
 		});
 		
@@ -65,7 +65,7 @@ public class ImageEditor {
 //				"/Users/tdixon/Documents/CS240/ImageEditor/src/nocomments.ppm",
 //				"/Users/tdixon/Documents/CS240/ImageEditor/src/blurry.ppm",
 //				"motionblur",
-//				"7"
+//				"1"
 //			};
 //			
 //			args = _args;
