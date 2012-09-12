@@ -37,8 +37,27 @@ public class Words implements Trie, Iterable<Trie.Node> {
 
 	@Override
 	public Iterator<Trie.Node> iterator() {
-		// TODO Auto-generated method stub
-		return null;
+		return new Iterator<Trie.Node>() {
+
+			@Override
+			public boolean hasNext() {
+				// TODO Auto-generated method stub
+				return false;
+			}
+
+			@Override
+			public Node next() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			@Override
+			public void remove() {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		};
 	}
 
 }
