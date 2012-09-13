@@ -1,63 +1,168 @@
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.EnumMap;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.NoSuchElementException;
 
-
-public class Words implements Trie, Iterable<Trie.Node> {
-
+class WordNode implements Trie.Node {
+	protected int count = 0;
+	protected Map<letter, WordNode> children = new EnumMap<letter, WordNode>(letter.class);
+	private letter l;
+	private int wordCount = -1;
+	private int nodeCount = -1;
+	
+	public WordNode() {}
+	
+	public WordNode(letter l) {
+		this.l = l;
+	}
+	
 	@Override
+	public int getValue() {
+		return count;
+	}
+	
 	public void add(String word) {
-		// TODO Auto-generated method stub
-
+		wordCount = nodeCount = -1;
+		letter l = letter.valueOf(word.charAt(0));
+		
+		if (word.length() == 1) {
+			this.add(l);
+			return;
+		}
+		
+		WordNode n = children.get(l);
+		if (n == null) {
+			n = new WordNode(l);
+			children.put(l, n);
+		}
+		
+		n.add(word.substring(1));
 	}
-
-	@Override
-	public Node find(String word) {
-		// TODO Auto-generated method stub
-		return null;
+	
+	public void add(letter l) {
+		wordCount = nodeCount = -1;
+		WordNode n = children.get(l);
+		
+		if (n == null) {
+			n = new WordNode(l);
+			children.put(l, n);
+		}
+		
+		++n.count;
 	}
-
-	@Override
+	
+	public WordNode find(String word) {
+		letter l = letter.valueOf(word.charAt(0));
+		
+		if (word.length() == 1) {
+			WordNode n = this.children.get(l);
+			if (n == null || n.count == 0) return null;
+			return n;
+		}
+		
+		WordNode n = this.children.get(l);
+		if (n == null) return null;
+		return n.find(word.substring(1));
+	}
+	
 	public int getWordCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		if (wordCount > -1) return wordCount;
+		
+		wordCount = 0;
+		
+		for (Entry<letter, WordNode> entry : children.entrySet()) {
+			WordNode n = entry.getValue();
+			if (n.count > 0) ++wordCount;
+			wordCount += n.getWordCount();
+		}
+		
+		return wordCount;
 	}
-
-	@Override
+	
 	public int getNodeCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		if (nodeCount > -1) return nodeCount;
+		
+		nodeCount = children.size();
+		
+		for (Entry<letter, WordNode> entry : children.entrySet()) {
+			WordNode n = entry.getValue();
+			nodeCount += n.getNodeCount();
+		}
+		
+		return nodeCount;
+	}
+	
+	public String toString() {
+		return "Node: letter=" + l + ", count=" + count;
+	}
+	
+	public boolean equals(WordNode n) {
+		return (
+				count == n.count &&
+				l.equals(n.l)
+			);
 	}
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public Iterator<Trie.Node> iterator() {
-		return new Iterator<Trie.Node>() {
-
+	public Iterator<WordNode> iterator() {
+		return new Iterator<WordNode>() {
+			private Deque<Iterator<WordNode>> iterators = new ArrayDeque<Iterator<WordNode>>();
+			
+			{ iterators.addFirst(WordNode.this.children.values().iterator()); }
+			
 			@Override
 			public boolean hasNext() {
-				// TODO Auto-generated method stub
-				return false;
+				return iterators.size() > 0 && iterators.peekFirst().hasNext();
 			}
 
 			@Override
-			public Node next() {
-				// TODO Auto-generated method stub
-				return null;
+			public WordNode next() {
+				if (!hasNext()) throw new NoSuchElementException();
+				Iterator<WordNode> i = iterators.peekFirst();
+				WordNode n = i.next();
+				
+				if (!i.hasNext())
+					iterators.removeFirst();
+			
+				if (n.children.size() > 0)
+					iterators.addFirst(n.children.values().iterator());
+				
+				return n;
 			}
 
 			@Override
 			public void remove() {
-				// TODO Auto-generated method stub
-				
-			}
-			
+				throw new UnsupportedOperationException();
+			}			
 		};
 	}
+}
 
+public class Words extends WordNode implements Trie, Iterable<WordNode> {
+	public int getNodeCount() {
+		return super.getNodeCount() + 1;
+	}
+	
+	public int hashCode() {
+		return getWordCount() + getNodeCount();
+	}
+	
+	public boolean equals(Words w) {
+		if (!(
+			hashCode() == w.hashCode() &&
+			getWordCount() == w.getWordCount() &&
+			getNodeCount() == w.getNodeCount()
+		)) return false;
+		
+		Iterator<WordNode> i1 = iterator();
+		Iterator<WordNode> i2 = w.iterator();
+		
+		while(i1.hasNext() && i2.hasNext()) {
+			if (!i1.next().equals(i2.next())) return false;
+		}
+		
+		return true;
+	}
 }
