@@ -151,6 +151,11 @@ public class Words extends WordNode implements Trie, Iterable<WordNode> {
 		return getWordCount() + getNodeCount();
 	}
 	
+	@Override
+	public boolean equals(Object o) {
+		return equals((Words) o);
+	}
+	
 	public boolean equals(Words w) {
 		if (!(
 			hashCode() == w.hashCode() &&
@@ -166,5 +171,12 @@ public class Words extends WordNode implements Trie, Iterable<WordNode> {
 		}
 		
 		return true;
+	}
+	
+	public static void main(String[] args) {
+		Words a = new Words();
+		Words b = new Words();
+		
+		System.out.println(a.equals(b));
 	}
 }
