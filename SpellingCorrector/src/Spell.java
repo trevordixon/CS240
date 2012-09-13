@@ -127,7 +127,11 @@ public class Spell {
 		
 		try {
 			Words dict = new Words();
-			while (sc.hasNext()) dict.add(sc.next());
+			while (sc.hasNext()) {
+				String s = sc.next();
+				if (s.matches("[A-Za-z]*"))
+					dict.add(s);
+			}
 			
 			String suggestion = getSuggestion(word, dict);
 			if (suggestion == null) {
