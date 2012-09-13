@@ -98,7 +98,24 @@ class WordNode implements Trie.Node {
 	}
 	
 	public String toString() {
-		return "Node: letter=" + l + ", count=" + count;
+		return toString("");
+	}
+	
+	public String toString(String memo) {
+		String s = "";
+		
+		for (Entry<letter, WordNode> e : children.entrySet()) {
+			letter l = e.getKey();
+			WordNode n = e.getValue();
+			String word = memo + l.toString();
+			
+			if (n.count > 0)
+				s += word.toLowerCase() + " " + n.count + "\n";
+			
+			s += n.toString(word);
+		}
+		
+		return s;
 	}
 	
 	public boolean equals(WordNode n) {
@@ -175,8 +192,12 @@ public class Words extends WordNode implements Trie, Iterable<WordNode> {
 	
 	public static void main(String[] args) {
 		Words a = new Words();
-		Words b = new Words();
+		a.add("Trevor");
+		a.add("a");
+		a.add("doggy");
+		a.add("a");
+		a.add("hippo");
 		
-		System.out.println(a.equals(b));
+		System.out.println(a);
 	}
 }
