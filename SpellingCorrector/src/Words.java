@@ -42,7 +42,7 @@ class WordNode implements Trie.Node {
 		n.add(word.substring(1));
 	}
 	
-	public void add(letter l) {
+	private void add(letter l) {
 		wordCount = nodeCount = -1;
 		WordNode n = children.get(l);
 		
@@ -55,6 +55,8 @@ class WordNode implements Trie.Node {
 	}
 	
 	public WordNode find(String word) {
+		if (word.equals("")) return null;
+		
 		letter l = letter.valueOf(word.charAt(0));
 		
 		if (word.length() == 1) {
