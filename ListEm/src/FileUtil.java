@@ -47,6 +47,7 @@ public abstract class FileUtil {
 			loopFiles();
 		} catch (NotADirectoryException e) {
 			System.out.println(dir.getPath() + " is not a directory");
+			System.out.println(summaryLabel() + 0);
 		}
 	}
 	
