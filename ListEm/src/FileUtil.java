@@ -57,6 +57,12 @@ public abstract class FileUtil {
 	}
 	
 	private int loopFiles(File dir, boolean printSummary) {
+		if (!dir.canRead()) {
+			System.out.println("File " + dir.getPath() + " is unreadable");
+			if (printSummary) System.out.println(summaryLabel() + 0);
+			return 0;
+		}
+		
 		File[] files = dir.listFiles(new FileFilter() {
 			public boolean accept(File f) {
 				if (f.isDirectory()) return recurse;
