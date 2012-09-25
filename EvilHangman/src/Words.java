@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public class Words implements Iterable<String> {
-	Set<String> words = new TreeSet<String>();;
+	public Set<String> words = new TreeSet<String>();
 	
 	public Words() { }
 	
@@ -17,6 +17,7 @@ public class Words implements Iterable<String> {
 		try {
 			wordList = new Scanner(new File(path));
 		} catch (FileNotFoundException e) {
+			// TODO: handle dictionary file not found
 			System.err.println("Dictionary file not found.");
 			return;
 		}
@@ -46,53 +47,35 @@ public class Words implements Iterable<String> {
 		return w;
 	}
 	
-	static int numberSetBits(int v) {
-		int c;
-		for (c = 0; v > 0; v >>= 1) c += v & 1;
-		return c;
-	}
-	
-	static int wordToBitmask(String w, char c) {
+	public Partition bestPartition(char c) {
 		c = Character.toLowerCase(c);
 		
-		int bitmask = 0;
+		Partition bestPartition = null;
 		
-		char[] cs = w.toCharArray();
-		for (int i = 0, j = 1; i < cs.length; i++, j *= 2) {
-			if (cs[i] == c)
-				bitmask += j;
-		}
-		return bitmask;
-	}
-	
-	public Words bestPartition(char c) {
-		c = Character.toLowerCase(c);
-		
-		int bestBitmask = -1;
-		Words bestPartition = new Words();
-		
-		Map<Integer, Words> partitions = new HashMap<Integer, Words>();
+		Map<Integer, Partition> partitions = new HashMap<Integer, Partition>();
 		for (String w : this) {
-			int bitmask = wordToBitmask(w, c);
+			int bitmask = Partition.wordToBitmask(w, c);
 			
 			if (!partitions.containsKey(bitmask)) {
-				partitions.put(bitmask, new Words());
+				partitions.put(bitmask, new Partition(bitmask));
 			}
 			
-			Words partition = partitions.get(bitmask);
-			partition.add(w);
+			Partition partition = partitions.get(bitmask);
+			partition.words.add(w);
+			
+			if (bestPartition == null) {
+				bestPartition = partition;
+				continue;
+			}
 			
 			if (partition.size() > bestPartition.size()) {
 				bestPartition = partition;
-				bestBitmask = bitmask;
 			} else if (partition.size() == bestPartition.size()) {
-				if (numberSetBits(bitmask) < numberSetBits(bestBitmask)) {
+				if (partition.letterCount() < bestPartition.letterCount()) {
 					bestPartition = partition;
-					bestBitmask = bitmask;
-				} else if (numberSetBits(bitmask) == numberSetBits(bestBitmask)) {
-					if (bitmask > bestBitmask) {
+				} else if (partition.letterCount() == bestPartition.letterCount()) {
+					if (partition.bitmask > bestPartition.bitmask) {
 						bestPartition = partition;
-						bestBitmask = bitmask;
 					}
 				}
 			}
