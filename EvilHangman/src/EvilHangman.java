@@ -111,7 +111,7 @@ public class EvilHangman {
 				
 				if (correctlyGuessedLetters == wordLength) {
 					System.out.println("You won!");
-					System.out.println("The word was: " + words.words.toArray()[0]);
+					System.out.println("Word: " + words.words.toArray()[0]);
 					return;
 				} else {
 					System.out.println("Yes, there " + (lc == 1 ? "is" : "are") + " " + lc + " " + c + (lc == 1 ? "" : "'s"));
