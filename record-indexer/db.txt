@@ -1,0 +1,5 @@
+CREATE TABLE "users" ("username" VARCHAR PRIMARY KEY  NOT NULL , "password" TEXT NOT NULL , "salt" VARCHAR NOT NULL, "first_name" VARCHAR NOT NULL, "last_name" VARCHAR NOT NULL, "email" VARCHAR NOT NULL, "indexed_records" INTEGER NOT NULL DEFAULT 0 )
+CREATE TABLE "projects" ("title" VARCHAR PRIMARY KEY  NOT NULL , "records_per_image" INTEGER, "first_y_coord" INTEGER, "record_height" INTEGER)
+CREATE TABLE "fields" ("project_title" VARCHAR NOT NULL , "title" VARCHAR NOT NULL , "x_coord" INTEGER, "width" INTEGER, "help_html" TEXT, PRIMARY KEY ("project_title", "title"))
+CREATE TABLE "images" ("project_title" VARCHAR NOT NULL , "file" VARCHAR NOT NULL , "data" BLOB, PRIMARY KEY ("project_title", "file"))
+CREATE TABLE "values" ("project_title" VARCHAR NOT NULL , "field_title" VARCHAR NOT NULL , "image_file" VARCHAR NOT NULL , "value"  NOT NULL , "username" VARCHAR, PRIMARY KEY ("project_title", "field_title", "image_file"))
