@@ -1,6 +1,7 @@
 package database;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -9,8 +10,9 @@ import javax.ws.rs.core.*;
 
 import server.BadParameterException;
 import server.Server;
+import shared.Value;
 
-@Path("/images")
+@Path("/batch")
 public class Images {
 	
 	@POST
@@ -27,7 +29,7 @@ public class Images {
 	}
 
 	@POST
-	@Path("get_batch")
+	@Path("get")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String getBatch(@FormParam("projectid") Integer projectid, @FormParam("username") String username) {
 		List<String> response = new ArrayList<String>();
@@ -67,4 +69,46 @@ public class Images {
 		}
 	}
 	
+	@POST
+	@Path("submit")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String submitBatch(@FormParam("batch") Integer imageid, @FormParam("record_values") String _values, @FormParam("username") String username) {
+		if (imageid == null || _values == null) throw new BadParameterException();
+			
+		try {
+			Map<String, String> imageInfo = DB.get("SELECT * FROM images WHERE rowid = ?", imageid).get(0);
+			Integer projectid = Integer.parseInt(imageInfo.get("projectid"));
+			if (!imageInfo.get("username").equals(username)) throw new BadParameterException();
+		
+			List<Map<String, String>> fields = DB.get("SELECT rowid,* FROM fields WHERE projectid = ? ORDER BY rowid ASC", projectid);
+			Map<String, String> projectInfo = DB.get("SELECT * FROM projects WHERE rowid = ?", projectid).get(0);
+			int recordsperimage = Integer.parseInt(projectInfo.get("recordsperimage"));
+			int firstycoord = Integer.parseInt(projectInfo.get("firstycoord"));
+			int recordheight = Integer.parseInt(projectInfo.get("recordheight"));
+			int numberValues = fields.size() * recordsperimage;
+			
+			String[] values = _values.split(",");
+			if (values.length != numberValues) throw new BadParameterException();
+			for (int i = 0, f = 0, r = 0; i < numberValues; i++) {
+				Map<String, String> properties = new HashMap<String, String>();
+				properties.put("fieldid", fields.get(f).get("rowid"));
+				properties.put("imageid", imageid.toString());
+				properties.put("value", values[i]);
+				properties.put("ycoord", String.valueOf(firstycoord + (r * recordheight)));
+				
+				if ((++f + 1) > fields.size()) {
+					f = 0;
+					++r;
+				}
+				
+				new Value(properties).save();
+			}
+
+			DB.run("UPDATE images SET username = NULL WHERE rowid = ?", imageid);
+			return "TRUE\n";
+		} catch (Exception e) {
+			throw new BadParameterException();
+		}
+	}
+
 }

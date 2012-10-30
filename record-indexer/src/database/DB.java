@@ -140,7 +140,6 @@ public class DB {
 	}
 	
 	public static int insertOrReplace(String table, Map<String, String> properties) {
-		
 		if (properties.containsKey("rowid")) {
 			return update(table, properties);
 		} else {

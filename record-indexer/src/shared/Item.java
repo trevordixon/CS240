@@ -28,8 +28,8 @@ public class Item {
 		return properties;
 	}
 	
-	public void save() {
-		DB.insertOrReplace(getTable(), properties);
+	public int save() {
+		return DB.insertOrReplace(getTable(), properties);
 	}
 	
 	public String getTable() {
