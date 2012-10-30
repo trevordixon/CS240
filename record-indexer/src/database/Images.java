@@ -1,6 +1,7 @@
 package database;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,7 @@ import javax.ws.rs.core.*;
 
 import server.BadParameterException;
 import server.Server;
+import shared.Util;
 import shared.Value;
 
 @Path("/batch")
@@ -109,6 +111,44 @@ public class Images {
 		} catch (Exception e) {
 			throw new BadParameterException();
 		}
+	}
+	
+	@POST
+	@Path("search")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String search(@FormParam("fields") String _fields, @FormParam("search_values") String _searchValues) {
+		String[] fields = _fields.split(",");
+		String[] searchValues = _searchValues.split(",");
+		
+		String[] p1 = new String[fields.length];
+		String[] p2 = new String[searchValues.length];
+		
+		for (int i = 0; i < fields.length; i++) {
+			p1[i] = "?";
+		}
+		
+		for (int i = 0; i < searchValues.length; i++) {
+			p2[i] = "?";
+		}
+		
+		String sql = "SELECT `values`.*, `values`.rowid, images.file FROM `values`, images WHERE images.rowid = `values`.imageid AND value IN (" + Util.join(p1, ",") + ") AND fieldid IN (" + Util.join(p2, ",") + ")";
+		List<Map<String, String>> results = DB.get(sql, Util.arrayConcat(searchValues, fields));
+		
+		StringBuilder response = new StringBuilder();
+		for (Map<String, String> result : results) {
+			response
+				.append(result.get("imageid"))
+				.append("\n")
+				.append(Server.URI + result.get("file"))
+				.append("\n")
+				.append(result.get("rowid"))
+				.append("\n")
+				.append(result.get("fieldid"))
+				.append("\n")
+			;
+		}
+		
+		return response.toString();
 	}
 
 }
