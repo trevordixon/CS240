@@ -29,13 +29,15 @@ public class Images {
 	@POST
 	@Path("get_batch")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String getBatch(@FormParam("projectid") Integer projectid) {
+	public String getBatch(@FormParam("projectid") Integer projectid, @FormParam("username") String username) {
 		List<String> response = new ArrayList<String>();
 		
 		if (projectid == null) throw new BadParameterException();
 		
 		try {
-			Map<String, String> image = DB.get("SELECT images.rowid AS imageid, * FROM projects, images WHERE projects.rowid = images.projectid AND projectid = ?", projectid).get(0);
+			Map<String, String> image = DB.get("SELECT images.rowid AS imageid, * FROM projects, images WHERE projects.rowid = images.projectid AND projectid = ? AND username IS NULL", projectid).get(0);
+			String[] values = {username, image.get("imageid")};
+			DB.run("UPDATE images SET username = ? WHERE rowid = ?", values);
 			
 			response.add(image.get("imageid"));
 			response.add(String.valueOf(projectid));

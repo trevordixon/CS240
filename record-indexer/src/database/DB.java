@@ -50,6 +50,15 @@ public class DB {
 		return run(sql, values);
 	}
 	
+	public static int run(String sql, String param) {
+		String[] values = {param};
+		return run(sql, values);
+	}
+	
+	public static int run(String sql, Integer param) {
+		return run(sql, param.toString());
+	}
+	
 	public static List<Map<String, String>> get(String sql, String[] values) {
 		getConnection();
 		try {

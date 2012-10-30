@@ -26,7 +26,7 @@ public class ServerUnitTests {
 				"server.ServerUnitTests"
 		};
 
-		runner.JUnitCore.main(testClasses);
+		org.junit.runner.JUnitCore.main(testClasses);
 	}
 	
 }
