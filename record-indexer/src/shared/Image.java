@@ -5,6 +5,8 @@ import javax.xml.bind.annotation.*;
 
 @XmlRootElement(name = "image")
 public class Image extends Item {
+	public Image() { }
+	
 	public Image(Map<String, String> properties) {
 		super(properties);
 	}

@@ -135,15 +135,18 @@ public class Import {
 	
 	private static void importRecords(Node _records, int imageid) {
 		NodeList records = _records.getChildNodes();
-		List<Map<String, String>> fields = DB.get("SELECT rowid AS fieldid, * FROM fields WHERE projectid = (SELECT projectid FROM images WHERE rowid = ?)", imageid);
-
+		List<Map<String, String>> fields = DB.get("SELECT rowid AS fieldid, * FROM fields WHERE projectid = (SELECT projectid FROM images WHERE rowid = ?) ORDER BY rowid ASC", imageid);
+		Map<String, String> project = DB.get("SELECT * FROM projects WHERE rowid = (SELECT projectid FROM images WHERE rowid = ?)", imageid).get(0);
+		int recordHeight = Integer.parseInt(project.get("recordheight"));
+		int ycoord = Integer.parseInt(project.get("firstycoord"));
+		
 		for (int i = 0; i < records.getLength(); i++) {
 			if (records.item(i).getNodeName().equals("#text")) continue;
 			
 			Node record = records.item(i);
-			NodeList values = record.getFirstChild().getChildNodes();
+			NodeList values = record.getChildNodes().item(1).getChildNodes();
 			
-			for (int j = 0; j < values.getLength(); j++) {
+			for (int j = 0, k = 0; j < values.getLength(); j++) {
 				Node valueNode = values.item(j);
 				if (valueNode.getNodeName().equals("#text")) continue;
 
@@ -152,12 +155,13 @@ public class Import {
 
 				properties.put("imageid", String.valueOf(imageid));
 				properties.put("value", valueNode.getTextContent());
-				properties.put("fieldid", fields.get(j).get("fieldid"));
+				properties.put("fieldid", fields.get(k++).get("fieldid"));
+				properties.put("ycoord", String.valueOf(ycoord));
 				
-				System.out.println(properties);
-				
-//				value.save();
+				value.save();
 			}
+
+			ycoord += recordHeight;
 			
 		}
 	}

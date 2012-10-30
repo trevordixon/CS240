@@ -5,6 +5,8 @@ import javax.xml.bind.annotation.*;
 
 @XmlRootElement(name = "field")
 public class Field extends Item {
+	public Field() { }
+	
 	public Field(Map<String, String> properties) {
 		super(properties);
 	}

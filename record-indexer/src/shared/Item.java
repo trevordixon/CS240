@@ -9,6 +9,10 @@ import database.DB;
 public class Item {
 	protected final Map<String, String> properties;
 	
+	public Item() {
+		properties = null;
+	}
+	
 	public Item(Map<String, String> properties) {
 		this.properties = properties;
 	}

@@ -5,6 +5,8 @@ import javax.xml.bind.annotation.*;
 
 @XmlRootElement(name = "user")
 public class User extends Item {
+	public User() { }
+	
 	public User(Map<String, String> properties) {
 		super(properties);
 	}

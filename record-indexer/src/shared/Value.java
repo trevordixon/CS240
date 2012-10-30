@@ -4,6 +4,8 @@ import java.util.Map;
 import javax.xml.bind.annotation.*;
 
 public class Value extends Item {
+	public Value() { }
+	
 	public Value(Map<String, String> properties) {
 		super(properties);
 	}

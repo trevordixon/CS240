@@ -107,7 +107,7 @@ public class DB {
 			values[i++] = entry.getValue();
 		}
 		
-		String sql = "INSERT INTO " + table + " (" + columns + ") VALUES (" + placeHolders + ")";
+		String sql = "INSERT INTO `" + table + "` (" + columns + ") VALUES (" + placeHolders + ")";
 		
 		run(sql, values);
 		return Integer.parseInt(get("SELECT last_insert_rowid() as id").get(0).get("id"));

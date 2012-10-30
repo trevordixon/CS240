@@ -12,6 +12,7 @@ public class Server {
 
 	private static final Logger LOGGER = Logger.getLogger(Server.class.getName());
 	private static int PORT = 39640;
+	public static final String URI = "http://localhost:" + PORT + "/";
 	
 	public static void main(String[] args) throws Exception {
 		if (args.length > 0) {
@@ -29,7 +30,7 @@ public class Server {
 			
 			rc.getResourceFilterFactories().add(AuthFilter.class.getName());
 			
-			HttpServer server = HttpServerFactory.create("http://localhost:" + PORT + "/", rc);
+			HttpServer server = HttpServerFactory.create(URI, rc);
 			server.start();
 			
 			LOGGER.info("Server listening on port " + PORT);
