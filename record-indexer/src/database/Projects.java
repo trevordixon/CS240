@@ -14,7 +14,6 @@ public class Projects {
 	
 	public static List<Project> get() {
 		List<Map<String, String>> results = DB.get("SELECT rowid, * FROM projects");
-		System.out.println(results);
 		
 		List<Project> list = new ArrayList<Project>();
 		for (Map<String, String> row : results) {

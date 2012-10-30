@@ -3,23 +3,14 @@ package shared;
 import java.util.Map;
 import javax.xml.bind.annotation.*;
 
-import database.DB;
-
 @XmlRootElement(name = "user")
-public class User {
-	private final Map<String, String> properties;
-	
+public class User extends Item {
 	public User(Map<String, String> properties) {
-		this.properties = properties;
+		super(properties);
 	}
 	
-	@XmlAttribute
-	public Integer getId() {
-		String id = properties.get("rowid");
-		if (id == null) return null;
-		return Integer.parseInt(id);
-	}
-	
+	public String getTable() { return "users"; }
+
 	@XmlElement
 	public String getUsername() {
 		return properties.get("username");
@@ -49,11 +40,4 @@ public class User {
 		return properties.get("password");
 	}
 	
-	public Map<String, String> getProperties() {
-		return properties;
-	}
-	
-	public void save() {
-		DB.insertOrReplace("users", properties);
-	}
 }

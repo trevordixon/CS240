@@ -12,8 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
-import shared.User;
-
 public class DB {
 	public static Connection connection = null;
 	
@@ -86,6 +84,15 @@ public class DB {
 		return get(sql, values);
 	}
 	
+	public static List<Map<String, String>> get(String sql, String param) {
+		String[] values = {param};
+		return get(sql, values);
+	}
+	
+	public static List<Map<String, String>> get(String sql, Integer param) {
+		return get(sql, param.toString());
+	}
+	
 	public static int insert(String table, Map<String, String> properties) {
 		String columns = "";
 		String placeHolders = "";
@@ -135,20 +142,4 @@ public class DB {
 		
 	}
 	
-	@SuppressWarnings("serial")
-	public static void main(String[] args) {
-		User user = new User(new HashMap<String, String>(){{
-			put("username", "asf");
-			put("password", "asdf");
-			put("firstname", "Trevor");
-			put("lastname", "Dude");
-			put("email", "trevordixon@gmail.com");
-		}});
-		
-		System.out.println(user.getId());
-		
-		insertOrReplace("users", user.getProperties());
-		
-		System.out.println(user.getId());
-	}
 }
