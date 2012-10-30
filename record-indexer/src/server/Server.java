@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 
 import com.sun.jersey.api.container.httpserver.HttpServerFactory;
 import com.sun.jersey.api.core.PackagesResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.net.httpserver.HttpServer;
 
 public class Server {
@@ -21,11 +22,14 @@ public class Server {
 		try {
 			LOGGER.info("Starting server on port " + PORT);
 			
-			HttpServer server = HttpServerFactory.create(
-				"http://localhost:" + PORT + "/",
-				new PackagesResourceConfig(Server.class.getPackage().getName())
-			);
+			ResourceConfig rc = new PackagesResourceConfig(
+				Server.class.getPackage().getName(),
+				database.DB.class.getPackage().getName()
+			); 
 			
+			rc.getResourceFilterFactories().add(AuthFilter.class.getName());
+			
+			HttpServer server = HttpServerFactory.create("http://localhost:" + PORT + "/", rc);
 			server.start();
 			
 			LOGGER.info("Server listening on port " + PORT);
