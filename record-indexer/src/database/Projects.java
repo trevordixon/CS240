@@ -26,7 +26,7 @@ public class Projects {
 
 	@POST
 	@Produces({MediaType.TEXT_XML, MediaType.APPLICATION_JSON})
-	public static Response get(@FormParam("username") String username, @FormParam("password") String password) {		
+	public static Response getStructured() {		
 		List<Project> projects = Projects.get();
 		GenericEntity<List<Project>> entity = new GenericEntity<List<Project>>(projects) {};
 		return Response.ok(entity).build();
@@ -35,7 +35,7 @@ public class Projects {
 
 	@POST
 	@Produces(MediaType.TEXT_PLAIN)
-	public static Response getPlainText(@FormParam("username") String username, @FormParam("password") String password) {
+	public static Response getPlainText() {
 		List<Project> projects = Projects.get();
 		
 		StringBuilder response = new StringBuilder();

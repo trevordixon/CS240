@@ -18,7 +18,7 @@ public class Users {
 
 	public static User get(String username) {
 		String[] values = {username};
-		List<Map<String, String>> results = DB.get("SELECT * FROM users WHERE username= ? LIMIT 1", values);
+		List<Map<String, String>> results = DB.get("SELECT rowid, * FROM users WHERE username= ? LIMIT 1", values);
 		
 		if (results.size() > 0) {
 			return new User(results.get(0));
