@@ -19,7 +19,7 @@ public class DB {
 		if (connection == null) {
 			try {
 		        Class.forName("org.sqlite.JDBC");
-				connection = DriverManager.getConnection("jdbc:sqlite:indexer_server.sqlite");
+				connection = DriverManager.getConnection("jdbc:sqlite:database/indexer_server.sqlite");
 			} catch (SQLException e) {
 				e.printStackTrace();
 			} catch (ClassNotFoundException e) {
