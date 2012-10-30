@@ -19,7 +19,7 @@ public class Server {
 			PORT = Integer.parseInt(args[0]);
 		}
 		
-		//Logger.getLogger("com.sun.jersey").setLevel(Level.OFF);
+		Logger.getLogger("com.sun.jersey").setLevel(Level.OFF);
 		try {
 			LOGGER.info("Starting server on port " + PORT);
 			
