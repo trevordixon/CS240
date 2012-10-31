@@ -118,6 +118,8 @@ public class Images {
 	@Path("search")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String search(@FormParam("fields") String _fields, @FormParam("search_values") String _searchValues) {
+		_searchValues = _searchValues.toLowerCase();
+		
 		String[] fields = _fields.split(",");
 		String[] searchValues = _searchValues.split(",");
 		
@@ -132,7 +134,9 @@ public class Images {
 			p2[i] = "?";
 		}
 		
-		String sql = "SELECT `values`.*, `values`.rowid, images.file FROM `values`, images WHERE images.rowid = `values`.imageid AND value IN (" + Util.join(p1, ",") + ") AND fieldid IN (" + Util.join(p2, ",") + ")";
+		String sql = "SELECT `values`.*, `values`.rowid, LOWER(`values`.value) AS lcval, images.file FROM `values`, images WHERE images.rowid = `values`.imageid AND lcval IN (" + Util.join(p1, ",") + ") AND fieldid IN (" + Util.join(p2, ",") + ")";
+		System.out.println(sql);
+		System.out.println(Arrays.toString(Util.arrayConcat(searchValues, fields)));
 		List<Map<String, String>> results = DB.get(sql, Util.arrayConcat(searchValues, fields));
 		
 		StringBuilder response = new StringBuilder();

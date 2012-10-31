@@ -211,7 +211,7 @@ public class Controller implements IController {
 			put("username", guiParams[0]);
 			put("password", guiParams[1]);
 			put("fields", guiParams[2]);
-			put("search_values", guiParams[2]);
+			put("search_values", guiParams[3]);
 		}};
 		
 		String endpoint = "batch/search";
