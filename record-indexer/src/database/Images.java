@@ -110,7 +110,7 @@ public class Images {
 				new Value(properties).save();
 			}
 
-			DB.run("UPDATE images SET username = NULL WHERE rowid = ?", imageid);
+			DB.run("UPDATE images SET username = '' WHERE rowid = ?", imageid);
 			return "TRUE\n";
 		} catch (Exception e) {
 			throw new BadParameterException();
