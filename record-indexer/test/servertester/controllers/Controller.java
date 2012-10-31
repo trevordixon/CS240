@@ -195,7 +195,7 @@ public class Controller implements IController {
 			put("username", guiParams[0]);
 			put("password", guiParams[1]);
 			put("batch", guiParams[2]);
-			put("record_values", guiParams[2]);
+			put("record_values", guiParams[3]);
 		}};
 		
 		String endpoint = "batch/submit";

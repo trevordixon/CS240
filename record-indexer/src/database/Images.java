@@ -1,7 +1,6 @@
 package database;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +11,6 @@ import javax.ws.rs.core.*;
 import com.sun.jersey.api.core.HttpContext;
 
 import server.BadParameterException;
-import server.Server;
 import shared.Util;
 import shared.Value;
 
@@ -101,7 +99,7 @@ public class Images {
 				Map<String, String> properties = new HashMap<String, String>();
 				properties.put("fieldid", fields.get(f).get("rowid"));
 				properties.put("imageid", imageid.toString());
-				properties.put("value", values[i]);
+				properties.put("value", values[i].trim());
 				properties.put("ycoord", String.valueOf(firstycoord + (r * recordheight)));
 				
 				if ((++f + 1) > fields.size()) {
@@ -129,6 +127,14 @@ public class Images {
 		
 		String[] fields = _fields.split(",");
 		String[] searchValues = _searchValues.split(",");
+		
+		for (int i = 0; i < fields.length; i++) {
+			fields[i] = fields[i].trim();
+		}
+		
+		for (int i = 0; i < searchValues.length; i++) {
+			searchValues[i] = searchValues[i].trim();
+		}
 		
 		String[] p1 = new String[fields.length];
 		String[] p2 = new String[searchValues.length];

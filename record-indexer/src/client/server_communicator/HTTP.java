@@ -4,7 +4,6 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 
-import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -48,7 +47,6 @@ public class HTTP {
 			.post(ClientResponse.class, data)
 		;
 
-		HttpURLConnection u;
 		return new ReqRes(data, response.getEntity(String.class), response);
 	}
 	
