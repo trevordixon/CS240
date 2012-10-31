@@ -12,7 +12,7 @@ public class Server {
 
 	private static final Logger LOGGER = Logger.getLogger(Server.class.getName());
 	private static int PORT = 39640;
-	public static final String URI = "http://localhost:" + PORT + "/";
+	private static final String URI = "http://0.0.0.0:" + PORT + "/";
 	
 	public static void main(String[] args) throws Exception {
 		if (args.length > 0) {

@@ -9,6 +9,8 @@ import java.util.Map;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
+import com.sun.jersey.api.core.HttpContext;
+
 import server.BadParameterException;
 import server.Server;
 import shared.Util;
@@ -20,11 +22,12 @@ public class Images {
 	@POST
 	@Path("sample")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String sampleImage(@FormParam("projectid") Integer projectid) {
+	public String sampleImage(@FormParam("projectid") Integer projectid, @Context HttpContext context) {
 		if (projectid == null) throw new BadParameterException();
 		try {
+			String baseUri = context.getRequest().getBaseUri().toString();
 			Map<String, String> image = DB.get("SELECT file FROM images WHERE projectid = ?", projectid).get(0);
-			return Server.URI + image.get("file") + "\n";
+			return baseUri + image.get("file") + "\n";
 		} catch (Exception e) {
 			throw new BadParameterException();
 		}
@@ -33,19 +36,21 @@ public class Images {
 	@POST
 	@Path("get")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String getBatch(@FormParam("projectid") Integer projectid, @FormParam("username") String username) {
+	public String getBatch(@FormParam("projectid") Integer projectid, @FormParam("username") String username, @Context HttpContext context) {
 		List<String> response = new ArrayList<String>();
 		
 		if (projectid == null) throw new BadParameterException();
 		
 		try {
+			String baseUri = context.getRequest().getBaseUri().toString();
+			
 			Map<String, String> image = DB.get("SELECT images.rowid AS imageid, * FROM projects, images WHERE projects.rowid = images.projectid AND projectid = ? AND username IS NULL", projectid).get(0);
 			String[] values = {username, image.get("imageid")};
 			DB.run("UPDATE images SET username = ? WHERE rowid = ?", values);
 			
 			response.add(image.get("imageid"));
 			response.add(String.valueOf(projectid));
-			response.add(Server.URI + image.get("file"));
+			response.add(baseUri + image.get("file"));
 			response.add(image.get("firstycoord"));
 			response.add(image.get("recordheight"));
 			response.add(image.get("recordsperimage"));
@@ -55,12 +60,12 @@ public class Images {
 				response.add(field.get("rowid"));
 				response.add(String.valueOf(fields.indexOf(field) + 1));
 				response.add(field.get("title"));
-				response.add(Server.URI + field.get("helphtml"));
+				response.add(baseUri + field.get("helphtml"));
 				response.add(field.get("xcoord"));
 				response.add(field.get("width"));
 				
 				if (field.get("knowndata") != null) {
-					response.add(Server.URI + field.get("knowndata"));
+					response.add(baseUri + field.get("knowndata"));
 				}
 			
 			}
@@ -117,7 +122,9 @@ public class Images {
 	@POST
 	@Path("search")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String search(@FormParam("fields") String _fields, @FormParam("search_values") String _searchValues) {
+	public String search(@FormParam("fields") String _fields, @FormParam("search_values") String _searchValues, @Context HttpContext context) {
+		String baseUri = context.getRequest().getBaseUri().toString();
+		
 		_searchValues = _searchValues.toLowerCase();
 		
 		String[] fields = _fields.split(",");
@@ -135,8 +142,6 @@ public class Images {
 		}
 		
 		String sql = "SELECT `values`.*, `values`.rowid, LOWER(`values`.value) AS lcval, images.file FROM `values`, images WHERE images.rowid = `values`.imageid AND lcval IN (" + Util.join(p1, ",") + ") AND fieldid IN (" + Util.join(p2, ",") + ")";
-		System.out.println(sql);
-		System.out.println(Arrays.toString(Util.arrayConcat(searchValues, fields)));
 		List<Map<String, String>> results = DB.get(sql, Util.arrayConcat(searchValues, fields));
 		
 		StringBuilder response = new StringBuilder();
@@ -144,7 +149,7 @@ public class Images {
 			response
 				.append(result.get("imageid"))
 				.append("\n")
-				.append(Server.URI + result.get("file"))
+				.append(baseUri + result.get("file"))
 				.append("\n")
 				.append(result.get("rowid"))
 				.append("\n")
