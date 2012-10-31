@@ -11,12 +11,13 @@ import com.sun.net.httpserver.HttpServer;
 public class Server {
 
 	private static final Logger LOGGER = Logger.getLogger(Server.class.getName());
-	private static int PORT = 39640;
-	private static final String URI = "http://0.0.0.0:" + PORT + "/";
+	private static int PORT;
+	private static String URI;
 	
 	public static void main(String[] args) throws Exception {
 		if (args.length > 0) {
 			PORT = Integer.parseInt(args[0]);
+			URI = "http://0.0.0.0:" + PORT + "/";
 		}
 		
 		Logger.getLogger("com.sun.jersey").setLevel(Level.OFF);
