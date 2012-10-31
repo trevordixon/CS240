@@ -67,6 +67,7 @@ public class Images {
 			
 			return shared.Util.join(response, "\n") + "\n";
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new BadParameterException();
 		}
 	}

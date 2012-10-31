@@ -5,7 +5,16 @@ import java.util.List;
 
 public class Util {
 	public static String join(List<String> strings, String sep) {
-		return join((String[]) strings.toArray(), sep);
+		String result = "";
+		for (String i : strings) {
+			if (!result.equals("")) {
+				result += sep;
+			}
+			
+			result += i;
+		}
+		
+		return result;
 	}
 
 	public static String join(String[] strings, String sep) {
