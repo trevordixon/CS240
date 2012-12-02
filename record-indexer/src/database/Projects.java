@@ -23,19 +23,23 @@ public class Projects {
 		return list;
 	}
 
-	@POST
+	@GET
 	@Produces({MediaType.TEXT_XML, MediaType.APPLICATION_JSON})
-	public static Response getStructured() {		
+	public static Response getStructured(@Context SecurityContext sc) {		
+		System.out.println(sc.getUserPrincipal().getName());
+
 		List<Project> projects = Projects.get();
 		GenericEntity<List<Project>> entity = new GenericEntity<List<Project>>(projects) {};
 		return Response.ok(entity).build();
 	}
 	
 
-	@POST
+	@GET
 	@Produces(MediaType.TEXT_PLAIN)
-	public static Response getPlainText() {
+	public static Response getPlainText(@Context SecurityContext sc) {
 		List<Project> projects = Projects.get();
+		
+		System.out.println(sc.getUserPrincipal().getName());
 		
 		StringBuilder response = new StringBuilder();
 		for (Project p : projects) {

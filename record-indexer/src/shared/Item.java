@@ -1,5 +1,6 @@
 package shared;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -10,7 +11,7 @@ public class Item {
 	protected final Map<String, String> properties;
 	
 	public Item() {
-		properties = null;
+		properties = new HashMap<String, String>();
 	}
 	
 	public Item(Map<String, String> properties) {
@@ -22,6 +23,14 @@ public class Item {
 		String id = properties.get("rowid");
 		if (id == null) return null;
 		return Integer.parseInt(id);
+	}
+	
+	public void setId(String id) {
+		properties.put("rowid", id);
+	}
+	
+	public void setId(Integer id) {
+		setId(id.toString());
 	}
 	
 	public Map<String, String> getProperties() {

@@ -1,5 +1,8 @@
 package database;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,18 +20,34 @@ import shared.Value;
 @Path("/batch")
 public class Images {
 	
-	@POST
-	@Path("sample")
-	@Produces(MediaType.TEXT_PLAIN)
-	public String sampleImage(@FormParam("projectid") Integer projectid, @Context HttpContext context) {
+	@GET
+	@Path("sample/{projectid}")
+	@Produces({MediaType.TEXT_PLAIN, MediaType.TEXT_XML})
+	public String sampleImage(@PathParam("projectid") Integer projectid, @Context HttpContext context) {
 		if (projectid == null) throw new BadParameterException();
 		try {
 			String baseUri = context.getRequest().getBaseUri().toString();
-			Map<String, String> image = DB.get("SELECT file FROM images WHERE projectid = ?", projectid).get(0);
-			return baseUri + image.get("file") + "\n";
+			Map<String, String> image = DB.get("SELECT rowid FROM images WHERE projectid = ?", projectid).get(0);
+			return baseUri + "batch/image/" + image.get("rowid") + "\n";
 		} catch (Exception e) {
 			throw new BadParameterException();
 		}
+	}
+	
+	@GET
+	@Path("image/{imageid}")
+	@Produces("image/png")
+	public Response getImage(@PathParam("imageid") String imageid) {
+		try {
+			PreparedStatement s = DB.connection.prepareStatement("SELECT data FROM images WHERE rowid = ?");
+			s.setString(1, imageid);
+			ResultSet r = s.executeQuery();
+			return Response.ok(r.getBytes("data")).build();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
 
 	@POST
@@ -48,7 +67,7 @@ public class Images {
 			
 			response.add(image.get("imageid"));
 			response.add(String.valueOf(projectid));
-			response.add(baseUri + image.get("file"));
+			response.add(baseUri + "batch/image/" + image.get("imageid"));
 			response.add(image.get("firstycoord"));
 			response.add(image.get("recordheight"));
 			response.add(image.get("recordsperimage"));

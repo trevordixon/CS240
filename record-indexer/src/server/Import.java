@@ -1,6 +1,8 @@
 package server;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +23,7 @@ import shared.*;
 public class Import {
 
 	private static Document doc;
+	private static String docPath;
 	
 	private static void importUsers() {
 		NodeList users = doc.getElementsByTagName("user");
@@ -127,6 +130,26 @@ public class Import {
 				}
 				
 				values.put(property.getNodeName(), property.getTextContent());
+				
+				if (property.getNodeName().equals("file")) {
+					String file = property.getTextContent();
+					String absPath = new File(docPath).getAbsoluteFile().getParentFile().getAbsolutePath() + File.separator + file;
+					File imageToSave = new File(absPath);
+					
+					try {
+						FileInputStream st = new FileInputStream(imageToSave);
+						byte[] b = new byte[(int) imageToSave.length()];
+						st.read(b);
+						image.setData(b);
+						st.close();
+					} catch (FileNotFoundException e) {
+						e.printStackTrace();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+
+					//System.out.println();
+				}
 			}
 			
 			image.save();
@@ -167,6 +190,7 @@ public class Import {
 	}
 	
 	public static void main(String[] args) throws SAXException, IOException, ParserConfigurationException {
+		docPath = args[0];
 		File xmlFile = new File(args[0]);
 		doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(xmlFile);
 		doc.getDocumentElement().normalize();

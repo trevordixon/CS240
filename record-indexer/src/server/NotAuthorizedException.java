@@ -10,6 +10,7 @@ public class NotAuthorizedException extends WebApplicationException {
     	super(
     		Response
     			.status(Response.Status.UNAUTHORIZED)
+    			.header("WWW-Authenticate", "Basic real=\"Indexer\"")
     			.entity(message)
     			.type(MediaType.TEXT_PLAIN)
     			.build()
