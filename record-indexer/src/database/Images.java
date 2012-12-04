@@ -14,6 +14,9 @@ import javax.ws.rs.core.*;
 import com.sun.jersey.api.core.HttpContext;
 
 import server.BadParameterException;
+import shared.Field;
+import shared.Batch;
+import shared.Project;
 import shared.Util;
 import shared.Value;
 
@@ -50,6 +53,26 @@ public class Images {
 		return null;
 	}
 
+	@GET
+	@Path("get/{projectid}")
+	@Produces(MediaType.TEXT_XML)
+	public Response getStructured(@PathParam("projectid") String projectid, @Context HttpContext context, @Context SecurityContext sc) {
+		String username = sc.getUserPrincipal().getName();
+		String baseUri = context.getRequest().getBaseUri().toString();
+		
+		Map<String, String> result = DB.get("SELECT images.rowid AS imageid, * FROM projects, images WHERE projects.rowid = images.projectid AND projectid = ? AND username IS NULL", projectid).get(0);
+		String[] values = {username, result.get("imageid")};
+//		DB.run("UPDATE images SET username = ? WHERE rowid = ?", values);
+
+		Batch batch = new Batch(result);
+		List<Field> fields = Fields.get(Integer.parseInt(projectid));
+		batch.setFields(fields);
+		batch.setUrl(baseUri + "batch/image/" + result.get("imageid"));
+		batch.setProject(new Project(result));
+		
+		return Response.ok(batch).build();
+	}
+	
 	@POST
 	@Path("get")
 	@Produces(MediaType.TEXT_PLAIN)
@@ -63,7 +86,7 @@ public class Images {
 			
 			Map<String, String> image = DB.get("SELECT images.rowid AS imageid, * FROM projects, images WHERE projects.rowid = images.projectid AND projectid = ? AND username IS NULL", projectid).get(0);
 			String[] values = {username, image.get("imageid")};
-			DB.run("UPDATE images SET username = ? WHERE rowid = ?", values);
+//			DB.run("UPDATE images SET username = ? WHERE rowid = ?", values);
 			
 			response.add(image.get("imageid"));
 			response.add(String.valueOf(projectid));

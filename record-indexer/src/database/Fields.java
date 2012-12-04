@@ -1,14 +1,28 @@
 package database;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
+import shared.Field;
+
 @Path("/fields")
 public class Fields {
 
+	public static List<Field> get(int projectid) {
+		List<Field> fields = new ArrayList<Field>();
+		
+		List<Map<String, String>> results = DB.get("SELECT rowid, * FROM fields WHERE projectid = ? ORDER BY rowid ASC", projectid);
+		for (Map<String, String> row : results) {
+			fields.add(new Field(row));
+		}
+
+		return fields;
+	}
+	
 	@POST
 	@Produces(MediaType.TEXT_PLAIN)
 	public String toString(@FormParam("projectid") Integer projectid) {

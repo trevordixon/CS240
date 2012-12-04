@@ -23,14 +23,26 @@ public class Field extends Item {
 		return properties.get("title");
 	}
 	
+	public void setTitle(String title) {
+		properties.put("title", title);
+	}
+	
 	@XmlElement
 	public Integer getXcoord() {
 		return Integer.parseInt(properties.get("xcoord"));
 	}
 	
+	public void setXcoord(Integer xcoord) {
+		properties.put("xcoord", xcoord.toString());
+	}
+	
 	@XmlElement
 	public Integer getWidth() {
 		return Integer.parseInt(properties.get("width"));
+	}
+	
+	public void setWidth(Integer width) {
+		properties.put("width", width.toString());
 	}
 	
 	@XmlElement

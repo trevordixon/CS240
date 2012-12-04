@@ -2,18 +2,22 @@ package shared;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 import javax.xml.bind.annotation.*;
 
 import database.DB;
 
 @XmlRootElement(name = "image")
-public class Image extends Item {
+public class Batch extends Item {
+	Project project;
 	byte[] data;
+	List<Field> fields;
+	String url;
 	
-	public Image() { }
+	public Batch() { }
 	
-	public Image(Map<String, String> properties) {
+	public Batch(Map<String, String> properties) {
 		super(properties);
 	}
 
@@ -24,6 +28,15 @@ public class Image extends Item {
 	}
 	
 	@XmlElement
+	public Project getProject() {
+		return project;
+	}
+	
+	public void setProject(Project project) {
+		this.project = project;
+	}
+	
+	@XmlElement
 	public Integer getProjectid() {
 		return Integer.parseInt(properties.get("projectid"));
 	}
@@ -31,6 +44,25 @@ public class Image extends Item {
 	@XmlElement
 	public String getFile() {
 		return properties.get("file");
+	}
+	
+	@XmlElementWrapper(name = "fields")
+	@XmlElement(name = "field")
+	public List<Field> getFields() {
+		return fields;
+	}
+	
+	public void setFields(List<Field> fields) {
+		this.fields = fields;
+	}
+	
+	@XmlElement
+	public String getUrl() {
+		return url;
+	}
+	
+	public void setUrl(String url) {
+		this.url = url;
 	}
 	
 	@Override

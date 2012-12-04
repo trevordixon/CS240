@@ -117,15 +117,15 @@ public class Import {
 			Map<String, String> values = new HashMap<String, String>();
 			values.put("projectid", String.valueOf(projectid));
 			
-			Image image = new Image(values);
+			Batch batch = new Batch(values);
 			
 			for (int j = 0; j < properties.getLength(); j++) {
 				Node property = properties.item(j);
 				
 				if (property.getNodeName().equals("#text")) continue;
 				if (property.getNodeName().equals("records")) {
-					image.save();
-					importRecords(property, image.getId());
+					batch.save();
+					importRecords(property, batch.getId());
 					continue;
 				}
 				
@@ -140,7 +140,7 @@ public class Import {
 						FileInputStream st = new FileInputStream(imageToSave);
 						byte[] b = new byte[(int) imageToSave.length()];
 						st.read(b);
-						image.setData(b);
+						batch.setData(b);
 						st.close();
 					} catch (FileNotFoundException e) {
 						e.printStackTrace();
@@ -152,7 +152,7 @@ public class Import {
 				}
 			}
 			
-			image.save();
+			batch.save();
 		}
 	}
 	

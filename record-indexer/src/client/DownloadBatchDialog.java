@@ -12,6 +12,8 @@ import javax.swing.JLabel;
 import javax.swing.JComboBox;
 import javax.ws.rs.core.MediaType;
 
+import client.listeners.DownloadListener;
+
 import com.sun.jersey.api.client.GenericType;
 
 import java.awt.GridBagLayout;
@@ -38,7 +40,12 @@ public class DownloadBatchDialog extends JDialog {
 	 */
 	public static void main(String[] args) {
 		try {
-			DownloadBatchDialog dialog = new DownloadBatchDialog();
+			DownloadBatchDialog dialog = new DownloadBatchDialog(new DownloadListener() {
+				@Override
+				public void callBack(Batch batch) {
+					System.out.println(batch);
+				}
+			});
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setVisible(true);
 		} catch (Exception e) {
@@ -49,7 +56,8 @@ public class DownloadBatchDialog extends JDialog {
 	/**
 	 * Create the dialog.
 	 */
-	public DownloadBatchDialog() {
+	public DownloadBatchDialog(final DownloadListener listener) {
+		setModal(true);
 		setModalityType(ModalityType.APPLICATION_MODAL);
 		setResizable(false);
 		setBounds(100, 100, 389, 114);
@@ -87,7 +95,10 @@ public class DownloadBatchDialog extends JDialog {
 			JButton btnViewSampleImage = new JButton("View Sample");
 			btnViewSampleImage.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					System.out.println(((Project) projectSelect.getSelectedItem()).getTitle());
+					Project selectedProject = (Project) projectSelect.getSelectedItem();
+					SampleImageDialog dialog = new SampleImageDialog(selectedProject);
+					dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+					dialog.setVisible(true);
 				}
 			});
 			GridBagConstraints gbc_btnViewSampleImage = new GridBagConstraints();
@@ -112,7 +123,20 @@ public class DownloadBatchDialog extends JDialog {
 				buttonPane.add(cancelButton);
 			}
 			{
+				final JDialog dialog = this;
 				JButton downloadButton = new JButton("Download");
+				downloadButton.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						Project selectedProject = (Project) projectSelect.getSelectedItem();
+						Batch batch = Communicator.resource
+							.path("batch/get/" + selectedProject.getId())
+							.accept(MediaType.TEXT_XML_TYPE)
+							.get(Batch.class);
+						
+						dialog.dispose();
+						listener.callBack(batch);
+					}
+				});
 				downloadButton.setActionCommand("Download");
 				buttonPane.add(downloadButton);
 				getRootPane().setDefaultButton(downloadButton);

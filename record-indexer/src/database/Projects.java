@@ -36,10 +36,8 @@ public class Projects {
 
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
-	public static Response getPlainText(@Context SecurityContext sc) {
+	public static Response getPlainText() {
 		List<Project> projects = Projects.get();
-		
-		System.out.println(sc.getUserPrincipal().getName());
 		
 		StringBuilder response = new StringBuilder();
 		for (Project p : projects) {

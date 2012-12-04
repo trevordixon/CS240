@@ -19,9 +19,14 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.Box;
 
+import shared.Batch;
+
+import client.listeners.DownloadListener;
+
 public class Indexer {
 
 	private JFrame frame;
+	private CurrentDataModel model;
 	
 	/**
 	 * Launch the application.
@@ -60,6 +65,22 @@ public class Indexer {
 		gridBagLayout.rowWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
 		frame.getContentPane().setLayout(gridBagLayout);
 		
+		JSplitPane mainSplitter = new JSplitPane();
+		mainSplitter.setResizeWeight(0.5);
+		mainSplitter.setOrientation(JSplitPane.VERTICAL_SPLIT);
+		GridBagConstraints gbc_mainSplitter = new GridBagConstraints();
+		gbc_mainSplitter.fill = GridBagConstraints.BOTH;
+		gbc_mainSplitter.gridx = 0;
+		gbc_mainSplitter.gridy = 1;
+		frame.getContentPane().add(mainSplitter, gbc_mainSplitter);
+		
+		JSplitPane bottomSplitter = new JSplitPane();
+		bottomSplitter.setResizeWeight(0.3);
+		mainSplitter.setRightComponent(bottomSplitter);
+		
+		final MainImagePanel mainImagePanel = new MainImagePanel();
+		mainSplitter.setLeftComponent(mainImagePanel);
+		
 		Box actions = Box.createHorizontalBox();
 		GridBagConstraints gbc_actions = new GridBagConstraints();
 		gbc_actions.insets = new Insets(3, 0, 2, 0);
@@ -69,9 +90,19 @@ public class Indexer {
 		frame.getContentPane().add(actions, gbc_actions);
 		
 		JButton btnZoomIn = new JButton("Zoom In");
+		btnZoomIn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				mainImagePanel.image.zoomIn();
+			}
+		});
 		actions.add(btnZoomIn);
 		
 		JButton btnZoomOut = new JButton("Zoom Out");
+		btnZoomOut.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				mainImagePanel.image.zoomOut();
+			}
+		});
 		actions.add(btnZoomOut);
 		
 		JButton btnInvertImage = new JButton("Invert Image");
@@ -86,36 +117,23 @@ public class Indexer {
 		JButton btnSubmit = new JButton("Submit");
 		actions.add(btnSubmit);
 		
-		JSplitPane mainSplitter = new JSplitPane();
-		mainSplitter.setResizeWeight(0.5);
-		mainSplitter.setOrientation(JSplitPane.VERTICAL_SPLIT);
-		GridBagConstraints gbc_mainSplitter = new GridBagConstraints();
-		gbc_mainSplitter.fill = GridBagConstraints.BOTH;
-		gbc_mainSplitter.gridx = 0;
-		gbc_mainSplitter.gridy = 1;
-		frame.getContentPane().add(mainSplitter, gbc_mainSplitter);
-		
-		JSplitPane bottomSplitter = new JSplitPane();
-		bottomSplitter.setResizeWeight(0.3);
-		mainSplitter.setRightComponent(bottomSplitter);
-		
 		JTabbedPane imageNav = new JTabbedPane(JTabbedPane.TOP);
 		bottomSplitter.setRightComponent(imageNav);
 		
-		JPanel panel = new JPanel();
-		imageNav.addTab("Field Help", null, panel, null);
+		JPanel fieldHelpPanel = new JPanel();
+		imageNav.addTab("Field Help", null, fieldHelpPanel, null);
 		
-		JPanel panel_1 = new JPanel();
-		imageNav.addTab("Image Navigation", null, panel_1, null);
+		JPanel imageNavPanel = new JPanel();
+		imageNav.addTab("Image Navigation", null, imageNavPanel, null);
 		
 		JTabbedPane entry = new JTabbedPane(JTabbedPane.TOP);
 		bottomSplitter.setLeftComponent(entry);
 		
-		JPanel panel_2 = new JPanel();
-		entry.addTab("Table Entry", null, panel_2, null);
+		final TableEntryPane tableEntryPane = new TableEntryPane();
+		entry.addTab("Table Entry", null, tableEntryPane, null);
 		
-		JPanel panel_3 = new JPanel();
-		entry.addTab("Form Entry", null, panel_3, null);
+		final FormEntryPanel formEntryPanel = new FormEntryPanel();
+		entry.addTab("Form Entry", null, formEntryPanel, null);
 		
 		JMenuBar menuBar = new JMenuBar();
 		frame.setJMenuBar(menuBar);
@@ -123,15 +141,27 @@ public class Indexer {
 		JMenu mnFile = new JMenu("File");
 		menuBar.add(mnFile);
 		
+		// Download Batch menu item
 		final JMenuItem mntmDownloadBatch = new JMenuItem("Download Batch");
 		mnFile.add(mntmDownloadBatch);
 		mntmDownloadBatch.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				mntmDownloadBatch.setEnabled(false);
-					
 				try {
-					DownloadBatchDialog dialog = new DownloadBatchDialog();
+					DownloadBatchDialog dialog = new DownloadBatchDialog(new DownloadListener(){
+						// CallBack when an image is downloaded
+						@Override
+						public void callBack(Batch batch) {
+							model = new CurrentDataModel(batch);
+							
+							mainImagePanel.setModel(model);
+							tableEntryPane.setModel(model);
+							formEntryPanel.setModel(model);
+
+							mntmDownloadBatch.setEnabled(false);
+						}
+					});
+					
 					dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 					dialog.setVisible(true);
 				} catch (Exception e1) {
@@ -147,5 +177,4 @@ public class Indexer {
 		JMenuItem mntmQuit = new JMenuItem("Quit");
 		mnFile.add(mntmQuit);
 	}
-
 }
