@@ -42,13 +42,23 @@ public class TableEntryPane extends JScrollPane {
 		
 		String[][] data = new String[project.getRecordsperimage()][fields.size() + 1];
 		
+		// Populate column headers
 		int i = 1;
 		for (Field field : fields) {
 			columnNames[i++] = field.getTitle();
 		}
 		
+		// Populate numbers in the first column
 		for (Integer row = 0; row < project.getRecordsperimage(); row++) {
-			data[row][0] = new Integer	(row + 1).toString();
+			data[row][0] = new Integer(row + 1).toString();
+		}
+		
+		String[][] initData = model.getData();
+		// Populate data
+		for (int row = 0; row < initData.length; row++) {
+			for (int col = 0; col < initData[row].length; col++) {
+				data[row][col+1] = initData[row][col];
+			}
 		}
 		
 		TableModel tableModel  = new DefaultTableModel(data, columnNames) {
@@ -66,6 +76,9 @@ public class TableEntryPane extends JScrollPane {
 		table.getSelectionModel().addListSelectionListener(selectionListener);
 		
 		table.setModel(tableModel);
+		
+		setSelectedCell(model.getSelectedRow(), model.getSelectedCol());
+		table.requestFocusInWindow();
 		
 		model.addListener(new DataListener() {
 			@Override

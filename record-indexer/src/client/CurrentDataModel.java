@@ -19,7 +19,7 @@ public class CurrentDataModel implements Serializable {
 	private int selectedRow = 0;
 	private int selectedCol = 0;
 	
-	Map<String, Integer> properties = new HashMap<String, Integer>();
+	Map<String, Object> properties = new HashMap<String, Object>();
 	
 	public Batch getBatch() {
 		return batch;
@@ -81,11 +81,11 @@ public class CurrentDataModel implements Serializable {
 		return selectedCol;
 	}
 	
-	public void setProperty(String key, Integer value) {
+	public void setProperty(String key, Object value) {
 		properties.put(key, value);
 	}
 	
-	public Integer getProperty(String key) {
+	public Object getProperty(String key) {
 		return properties.get(key);
 	}
 	

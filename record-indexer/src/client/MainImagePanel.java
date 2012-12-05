@@ -12,7 +12,7 @@ import javax.swing.JPanel;
 
 @SuppressWarnings("serial")
 public class MainImagePanel extends JPanel {
-	MainImage image = new MainImage();
+	MainImage2 image = new MainImage2();
 	CurrentDataModel model;
 	
 	public MainImagePanel() {
@@ -89,10 +89,20 @@ public class MainImagePanel extends JPanel {
 		
 		int panelWidth = this.getWidth();
 
-		Integer imageX = model.getProperty("imageX");
-		Integer imageY = model.getProperty("imageY");
+		Integer imageX = (Integer) model.getProperty("imageX");
+		Integer imageY = (Integer) model.getProperty("imageY");
 		
-		if (imageX != null && imageY != null) image.setLocation(imageX, imageY);
-		else image.setLocation((panelWidth - image.getWidth())/2, 10);
+		if (imageX == null) {
+			imageX = (panelWidth - image.getWidth())/2;
+			model.setProperty("imageX", imageX);
+		}
+
+		if (imageY == null) {
+			imageY = 10;
+			model.setProperty("imageY", imageY);
+		}
+		
+		image.setLocation(imageX, imageY);
+		image.repaint();
 	}
 }

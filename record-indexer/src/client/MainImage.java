@@ -21,7 +21,7 @@ public class MainImage extends JPanel {
 	Image image;
 	Image scaledImage;
 	JLabel imageLabel = new JLabel();
-	double scalar = 1;
+	Double scalar = new Double(1);
 	
 	public MainImage() {
 		super();
@@ -56,6 +56,8 @@ public class MainImage extends JPanel {
 	public void setModel(CurrentDataModel model) {
 		this.model = model;
 		
+		Double scalar = (Double) model.getProperty("imageScalar");
+		if (scalar != null) this.scalar = scalar;
 		setImage(model.getBatch().getUrl());
 		
 		Project project = model.getBatch().getProject();
@@ -76,11 +78,13 @@ public class MainImage extends JPanel {
 	
 	public void zoomIn() {
 		scalar *= 1.1;
+		model.setProperty("imageScalar", scalar);
 		refresh();
 	}
 	
 	public void zoomOut() {
 		scalar *= 0.9;
+		model.setProperty("imageScalar", scalar);
 		refresh();
 	}
 	

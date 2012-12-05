@@ -96,7 +96,12 @@ public class Indexer {
 		if (!saved) model = new CurrentDataModel();
 		
 		Rectangle bounds;
-		if (saved) bounds = new Rectangle(model.getProperty("frameX"), model.getProperty("frameY"), model.getProperty("frameWidth"), model.getProperty("frameHeight"));
+		if (saved) bounds = new Rectangle(
+			(Integer) model.getProperty("frameX"),
+			(Integer) model.getProperty("frameY"),
+			(Integer) model.getProperty("frameWidth"),
+			(Integer) model.getProperty("frameHeight")
+		);
 		else bounds = new Rectangle(300, 300, 800, 600);
 		
 		frame = new JFrame();
@@ -113,7 +118,7 @@ public class Indexer {
 		mainSplitter.setContinuousLayout(true);
 		mainSplitter.setResizeWeight(1.0);
 		mainSplitter.setOrientation(JSplitPane.VERTICAL_SPLIT);
-		if (saved) mainSplitter.setDividerLocation(model.getProperty("mainDivider"));
+		if (saved) mainSplitter.setDividerLocation((Integer) model.getProperty("mainDivider"));
 		GridBagConstraints gbc_mainSplitter = new GridBagConstraints();
 		gbc_mainSplitter.fill = GridBagConstraints.BOTH;
 		gbc_mainSplitter.gridx = 0;
@@ -123,7 +128,7 @@ public class Indexer {
 		bottomSplitter = new JSplitPane();
 		bottomSplitter.setContinuousLayout(true);
 		bottomSplitter.setResizeWeight(0.3);
-		if (saved) bottomSplitter.setDividerLocation(model.getProperty("bottomDivider"));
+		if (saved) bottomSplitter.setDividerLocation((Integer) model.getProperty("bottomDivider"));
 		mainSplitter.setRightComponent(bottomSplitter);
 		
 		mainImagePanel = new MainImagePanel();
@@ -184,6 +189,8 @@ public class Indexer {
 		
 		JPanel imageNavPanel = new JPanel();
 		imageNav.addTab("Image Navigation", null, imageNavPanel, null);
+		
+		imageNav.setSelectedIndex(1);
 		
 		final JTabbedPane entry = new JTabbedPane(JTabbedPane.TOP);
 		bottomSplitter.setLeftComponent(entry);
