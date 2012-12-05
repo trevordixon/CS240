@@ -3,6 +3,7 @@ package shared;
 import java.util.Map;
 import javax.xml.bind.annotation.*;
 
+@SuppressWarnings("serial")
 @XmlRootElement(name = "field")
 public class Field extends Item {
 	public Field() { }

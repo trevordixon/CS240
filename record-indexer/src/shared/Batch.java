@@ -8,6 +8,7 @@ import javax.xml.bind.annotation.*;
 
 import database.DB;
 
+@SuppressWarnings("serial")
 @XmlRootElement(name = "image")
 public class Batch extends Item {
 	Project project;

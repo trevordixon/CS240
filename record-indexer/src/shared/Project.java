@@ -3,6 +3,7 @@ package shared;
 import java.util.Map;
 import javax.xml.bind.annotation.*;
 
+@SuppressWarnings("serial")
 @XmlRootElement(name = "project")
 public class Project extends Item {
 	public Project() { super(); }

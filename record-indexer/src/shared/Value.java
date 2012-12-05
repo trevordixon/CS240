@@ -3,6 +3,7 @@ package shared;
 import java.util.Map;
 import javax.xml.bind.annotation.*;
 
+@SuppressWarnings("serial")
 public class Value extends Item {
 	public Value() { }
 	

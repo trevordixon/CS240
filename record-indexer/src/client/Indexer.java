@@ -29,9 +29,6 @@ import javax.swing.Box;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import com.apple.eawt.AppEvent.QuitEvent;
-import com.apple.eawt.QuitResponse;
-
 import shared.Batch;
 
 import client.listeners.DownloadListener;
