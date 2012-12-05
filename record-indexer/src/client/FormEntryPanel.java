@@ -43,7 +43,7 @@ public class FormEntryPanel extends JPanel {
 	public void setModel(final CurrentDataModel model) {
 		this.model = model;
 		
-		Batch batch = model.batch;
+		Batch batch = model.getBatch();
 		Project project = batch.getProject();
 		List<Field> fields = batch.getFields();
 		
@@ -77,7 +77,7 @@ public class FormEntryPanel extends JPanel {
 		
 		textFields = new JTextField[fields.size()];
 		int col = 0;
-		for (Field field : model.batch.getFields()) {
+		for (Field field : model.getBatch().getFields()) {
 			JPanel horizLayout = new JPanel();
 			horizLayout.setLayout(new BoxLayout(horizLayout, BoxLayout.X_AXIS));
 			horizLayout.setSize(horizLayout.getWidth(), 30);

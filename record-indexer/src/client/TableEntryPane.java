@@ -34,8 +34,8 @@ public class TableEntryPane extends JScrollPane {
 	public void setModel(final CurrentDataModel model) {
 		this.model = model;
 		
-		Project project = model.batch.getProject();
-		List<Field> fields = model.batch.getFields();
+		Project project = model.getBatch().getProject();
+		List<Field> fields = model.getBatch().getFields();
 		
 		String[] columnNames = new String[fields.size() + 1];
 		columnNames[0] = "";

@@ -1,5 +1,6 @@
 package client;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,7 +11,7 @@ import shared.Batch;
 
 @SuppressWarnings("serial")
 public class CurrentDataModel implements Serializable {
-	public final Batch batch;
+	private Batch batch;
 
 	private transient Set<DataListener> listeners = new HashSet<DataListener>();
 	private String[][] data;
@@ -20,8 +21,13 @@ public class CurrentDataModel implements Serializable {
 	
 	Map<String, Integer> properties = new HashMap<String, Integer>();
 	
-	public CurrentDataModel(Batch batch) {
+	public Batch getBatch() {
+		return batch;
+	}
+	
+	public void setBatch(Batch batch) {
 		this.batch = batch;
+
 		data = new String[batch.getProject().getRecordsperimage()][batch.getFields().size()];
 		
 		for (int row = 0; row < data.length; row++) {
@@ -82,4 +88,9 @@ public class CurrentDataModel implements Serializable {
 	public Integer getProperty(String key) {
 		return properties.get(key);
 	}
+	
+	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+		    in.defaultReadObject();
+		    listeners = new HashSet<DataListener>();
+		}
 }

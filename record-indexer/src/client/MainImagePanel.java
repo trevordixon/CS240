@@ -57,7 +57,12 @@ public class MainImagePanel extends JPanel {
 					return;
 				}
 
-				image.setLocation(image.getX() + (e.getX() - oldX), image.getY() + (e.getY() - oldY));
+				int imageX = image.getX() + (e.getX() - oldX);
+				int imageY = image.getY() + (e.getY() - oldY);
+				image.setLocation(imageX, imageY);
+				
+				model.setProperty("imageX", imageX);
+				model.setProperty("imageY", imageY);
 			}
 
 			@Override
@@ -83,6 +88,11 @@ public class MainImagePanel extends JPanel {
 		image.setModel(model);
 		
 		int panelWidth = this.getWidth();
-		image.setLocation((panelWidth - image.getWidth())/2, 10);
+
+		Integer imageX = model.getProperty("imageX");
+		Integer imageY = model.getProperty("imageY");
+		
+		if (imageX != null && imageY != null) image.setLocation(imageX, imageY);
+		else image.setLocation((panelWidth - image.getWidth())/2, 10);
 	}
 }

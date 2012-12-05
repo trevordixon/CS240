@@ -56,10 +56,10 @@ public class MainImage extends JPanel {
 	public void setModel(CurrentDataModel model) {
 		this.model = model;
 		
-		setImage(model.batch.getUrl());
+		setImage(model.getBatch().getUrl());
 		
-		Project project = model.batch.getProject();
-		List<Field> fields = model.batch.getFields();
+		Project project = model.getBatch().getProject();
+		List<Field> fields = model.getBatch().getFields();
 		
 		for (int i = 0; i < project.getRecordsperimage(); i++) {
 			for (Field field : fields) {

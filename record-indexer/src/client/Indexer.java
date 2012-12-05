@@ -12,6 +12,8 @@ import javax.swing.JPanel;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -27,6 +29,9 @@ import javax.swing.Box;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import com.apple.eawt.AppEvent.QuitEvent;
+import com.apple.eawt.QuitResponse;
+
 import shared.Batch;
 
 import client.listeners.DownloadListener;
@@ -37,6 +42,19 @@ public class Indexer {
 	private CurrentDataModel model;
 	private JSplitPane mainSplitter;
 	private JSplitPane bottomSplitter;
+	private MainImagePanel mainImagePanel;
+	private TableEntryPane tableEntryPane;
+	private FormEntryPanel formEntryPanel;
+
+	private JMenuItem mntmDownloadBatch;
+	
+	private JButton btnZoomIn;
+	private JButton btnZoomOut;
+	private JButton btnToggleHighlights;
+	private JButton btnInvertImage;
+	private JButton btnSave;
+	private JButton btnSubmit;
+
 	
 	/**
 	 * Launch the application.
@@ -78,7 +96,7 @@ public class Indexer {
 		}
 		
 		boolean saved = model != null;
-		if (saved) System.out.println(model.getSelectedRow());
+		if (!saved) model = new CurrentDataModel();
 		
 		Rectangle bounds;
 		if (saved) bounds = new Rectangle(model.getProperty("frameX"), model.getProperty("frameY"), model.getProperty("frameWidth"), model.getProperty("frameHeight"));
@@ -111,7 +129,7 @@ public class Indexer {
 		if (saved) bottomSplitter.setDividerLocation(model.getProperty("bottomDivider"));
 		mainSplitter.setRightComponent(bottomSplitter);
 		
-		final MainImagePanel mainImagePanel = new MainImagePanel();
+		mainImagePanel = new MainImagePanel();
 		mainSplitter.setLeftComponent(mainImagePanel);
 		
 		Box actions = Box.createHorizontalBox();
@@ -122,7 +140,7 @@ public class Indexer {
 		gbc_actions.gridy = 0;
 		frame.getContentPane().add(actions, gbc_actions);
 		
-		final JButton btnZoomIn = new JButton("Zoom In");
+		btnZoomIn = new JButton("Zoom In");
 		btnZoomIn.setEnabled(false);
 		btnZoomIn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -131,7 +149,7 @@ public class Indexer {
 		});
 		actions.add(btnZoomIn);
 		
-		final JButton btnZoomOut = new JButton("Zoom Out");
+		btnZoomOut = new JButton("Zoom Out");
 		btnZoomOut.setEnabled(false);
 		btnZoomOut.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -140,15 +158,15 @@ public class Indexer {
 		});
 		actions.add(btnZoomOut);
 		
-		final JButton btnInvertImage = new JButton("Invert Image");
+		btnInvertImage = new JButton("Invert Image");
 		btnInvertImage.setEnabled(false);
 		actions.add(btnInvertImage);
 		
-		final JButton btnToggleHighlights = new JButton("Toggle Highlights");
+		btnToggleHighlights = new JButton("Toggle Highlights");
 		btnToggleHighlights.setEnabled(false);
 		actions.add(btnToggleHighlights);
 		
-		final JButton btnSave = new JButton("Save");
+		btnSave = new JButton("Save");
 		btnSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				saveState();
@@ -157,7 +175,7 @@ public class Indexer {
 		btnSave.setEnabled(false);
 		actions.add(btnSave);
 		
-		final JButton btnSubmit = new JButton("Submit");
+		btnSubmit = new JButton("Submit");
 		btnSubmit.setEnabled(false);
 		actions.add(btnSubmit);
 		
@@ -173,10 +191,10 @@ public class Indexer {
 		final JTabbedPane entry = new JTabbedPane(JTabbedPane.TOP);
 		bottomSplitter.setLeftComponent(entry);
 		
-		final TableEntryPane tableEntryPane = new TableEntryPane();
+		tableEntryPane = new TableEntryPane();
 		entry.addTab("Table Entry", null, tableEntryPane, null);
 		
-		final FormEntryPanel formEntryPanel = new FormEntryPanel();
+		formEntryPanel = new FormEntryPanel();
 		entry.addTab("Form Entry", null, formEntryPanel, null);
 		
 		entry.addChangeListener(new ChangeListener(){
@@ -194,7 +212,7 @@ public class Indexer {
 		menuBar.add(mnFile);
 		
 		// Download Batch menu item
-		final JMenuItem mntmDownloadBatch = new JMenuItem("Download Batch");
+		mntmDownloadBatch = new JMenuItem("Download Batch");
 		mnFile.add(mntmDownloadBatch);
 		mntmDownloadBatch.addActionListener(new ActionListener(){
 			@Override
@@ -204,20 +222,9 @@ public class Indexer {
 						// CallBack when an image is downloaded
 						@Override
 						public void callBack(Batch batch) {
-							model = new CurrentDataModel(batch);
+							model.setBatch(batch);
 							
-							mainImagePanel.setModel(model);
-							tableEntryPane.setModel(model);
-							formEntryPanel.setModel(model);
-
-							mntmDownloadBatch.setEnabled(false);
-							
-							btnZoomIn.setEnabled(true);
-							btnZoomOut.setEnabled(true);
-							btnToggleHighlights.setEnabled(true);
-							btnInvertImage.setEnabled(true);
-							btnSave.setEnabled(true);
-							btnSubmit.setEnabled(true);
+							loadBatch();
 						}
 					});
 					
@@ -235,6 +242,58 @@ public class Indexer {
 		
 		JMenuItem mntmQuit = new JMenuItem("Quit");
 		mnFile.add(mntmQuit);
+		
+		if (model.getBatch() != null) loadBatch();
+		
+		frame.addWindowListener(new WindowListener() {
+			@Override
+			public void windowOpened(WindowEvent e) { }
+			@Override
+			public void windowClosing(WindowEvent e) {
+				saveState();
+			}
+			@Override
+			public void windowClosed(WindowEvent e) { }
+			@Override
+			public void windowIconified(WindowEvent e) { }
+			@Override
+			public void windowDeiconified(WindowEvent e) { }
+			@Override
+			public void windowActivated(WindowEvent e) { }
+			@Override
+			public void windowDeactivated(WindowEvent e) { }
+		});
+		
+		
+		try {
+			Class.forName(com.apple.eawt.Application.class.getName());
+
+			com.apple.eawt.Application app = com.apple.eawt.Application.getApplication();
+			app.setQuitHandler(new com.apple.eawt.QuitHandler() {
+				@Override
+				public void handleQuitRequestWith(com.apple.eawt.AppEvent.QuitEvent qe, com.apple.eawt.QuitResponse qr) {
+					saveState();
+					qr.performQuit();
+				}
+			});
+		} catch (ClassNotFoundException e1) {
+			// Not on OS X, ignore
+		}
+	}
+	
+	public void loadBatch() {
+		mainImagePanel.setModel(model);
+		tableEntryPane.setModel(model);
+		formEntryPanel.setModel(model);
+
+		mntmDownloadBatch.setEnabled(false);
+		
+		btnZoomIn.setEnabled(true);
+		btnZoomOut.setEnabled(true);
+		btnToggleHighlights.setEnabled(true);
+		btnInvertImage.setEnabled(true);
+		btnSave.setEnabled(true);
+		btnSubmit.setEnabled(true);
 	}
 	
 	public void saveState() {
