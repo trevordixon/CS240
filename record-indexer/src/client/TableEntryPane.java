@@ -31,7 +31,7 @@ public class TableEntryPane extends JScrollPane {
 		setViewportView(table);
 	}
 
-	public void setModel(CurrentDataModel model) {
+	public void setModel(final CurrentDataModel model) {
 		this.model = model;
 		
 		Project project = model.batch.getProject();
@@ -55,6 +55,11 @@ public class TableEntryPane extends JScrollPane {
 			public boolean isCellEditable(int row, int column) {
 				return column != 0;
 			}
+			
+			public void setValueAt(Object value, int row, int col) {
+				super.setValueAt(value, row, col);
+				model.updateData(row, col-1, (String) value);
+			}
 		};
 
 		table.getColumnModel().getSelectionModel().addListSelectionListener(selectionListener);
@@ -65,12 +70,13 @@ public class TableEntryPane extends JScrollPane {
 		model.addListener(new DataListener() {
 			@Override
 			public void selectionChange(int row, int col) {
-				System.out.println("Table detected selection change: " + row + "  " + col);
+				table.setRowSelectionInterval(row, row);
+				table.setColumnSelectionInterval(col+1, col+1);
 			}
 
 			@Override
 			public void dataChange(int row, int col, String data) {
-				// TODO Auto-generated method stub
+				table.setValueAt(data, row, col+1);
 			}
 		});
 	}

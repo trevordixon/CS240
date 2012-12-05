@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 
 import database.DB;
 
-public class Item {
+public class Item implements java.io.Serializable {
 	protected final Map<String, String> properties;
 	
 	public Item() {

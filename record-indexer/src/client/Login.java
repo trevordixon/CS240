@@ -17,6 +17,7 @@ import javax.swing.JPasswordField;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
+@SuppressWarnings("serial")
 public class Login extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();

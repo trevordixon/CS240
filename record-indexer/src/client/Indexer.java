@@ -1,6 +1,7 @@
 package client;
 
 import java.awt.EventQueue;
+import java.awt.Rectangle;
 
 import javax.swing.JFrame;
 import java.awt.GridBagLayout;
@@ -11,6 +12,11 @@ import javax.swing.JPanel;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -18,6 +24,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.Box;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import shared.Batch;
 
@@ -27,6 +35,8 @@ public class Indexer {
 
 	private JFrame frame;
 	private CurrentDataModel model;
+	private JSplitPane mainSplitter;
+	private JSplitPane bottomSplitter;
 	
 	/**
 	 * Launch the application.
@@ -55,8 +65,27 @@ public class Indexer {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
+		try {
+			FileInputStream fileIn = new FileInputStream(Communicator.getUsername() + ".ser");
+			ObjectInputStream in = new ObjectInputStream(fileIn);
+           	model = (CurrentDataModel) in.readObject();
+           	in.close();
+           	fileIn.close();
+		} catch (IOException i) {
+			// ignore
+		} catch (ClassNotFoundException c) {
+			c.printStackTrace();
+		}
+		
+		boolean saved = model != null;
+		if (saved) System.out.println(model.getSelectedRow());
+		
+		Rectangle bounds;
+		if (saved) bounds = new Rectangle(model.getProperty("frameX"), model.getProperty("frameY"), model.getProperty("frameWidth"), model.getProperty("frameHeight"));
+		else bounds = new Rectangle(300, 300, 800, 600);
+		
 		frame = new JFrame();
-		frame.setBounds(300, 300, 800, 600);
+		frame.setBounds(bounds);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{0, 0};
@@ -65,17 +94,21 @@ public class Indexer {
 		gridBagLayout.rowWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
 		frame.getContentPane().setLayout(gridBagLayout);
 		
-		JSplitPane mainSplitter = new JSplitPane();
-		mainSplitter.setResizeWeight(0.5);
+		mainSplitter = new JSplitPane();
+		mainSplitter.setContinuousLayout(true);
+		mainSplitter.setResizeWeight(1.0);
 		mainSplitter.setOrientation(JSplitPane.VERTICAL_SPLIT);
+		if (saved) mainSplitter.setDividerLocation(model.getProperty("mainDivider"));
 		GridBagConstraints gbc_mainSplitter = new GridBagConstraints();
 		gbc_mainSplitter.fill = GridBagConstraints.BOTH;
 		gbc_mainSplitter.gridx = 0;
 		gbc_mainSplitter.gridy = 1;
 		frame.getContentPane().add(mainSplitter, gbc_mainSplitter);
 		
-		JSplitPane bottomSplitter = new JSplitPane();
+		bottomSplitter = new JSplitPane();
+		bottomSplitter.setContinuousLayout(true);
 		bottomSplitter.setResizeWeight(0.3);
+		if (saved) bottomSplitter.setDividerLocation(model.getProperty("bottomDivider"));
 		mainSplitter.setRightComponent(bottomSplitter);
 		
 		final MainImagePanel mainImagePanel = new MainImagePanel();
@@ -89,7 +122,8 @@ public class Indexer {
 		gbc_actions.gridy = 0;
 		frame.getContentPane().add(actions, gbc_actions);
 		
-		JButton btnZoomIn = new JButton("Zoom In");
+		final JButton btnZoomIn = new JButton("Zoom In");
+		btnZoomIn.setEnabled(false);
 		btnZoomIn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				mainImagePanel.image.zoomIn();
@@ -97,7 +131,8 @@ public class Indexer {
 		});
 		actions.add(btnZoomIn);
 		
-		JButton btnZoomOut = new JButton("Zoom Out");
+		final JButton btnZoomOut = new JButton("Zoom Out");
+		btnZoomOut.setEnabled(false);
 		btnZoomOut.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				mainImagePanel.image.zoomOut();
@@ -105,16 +140,25 @@ public class Indexer {
 		});
 		actions.add(btnZoomOut);
 		
-		JButton btnInvertImage = new JButton("Invert Image");
+		final JButton btnInvertImage = new JButton("Invert Image");
+		btnInvertImage.setEnabled(false);
 		actions.add(btnInvertImage);
 		
-		JButton btnToggleHighlights = new JButton("Toggle Highlights");
+		final JButton btnToggleHighlights = new JButton("Toggle Highlights");
+		btnToggleHighlights.setEnabled(false);
 		actions.add(btnToggleHighlights);
 		
-		JButton btnSave = new JButton("Save");
+		final JButton btnSave = new JButton("Save");
+		btnSave.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				saveState();
+			}
+		});
+		btnSave.setEnabled(false);
 		actions.add(btnSave);
 		
-		JButton btnSubmit = new JButton("Submit");
+		final JButton btnSubmit = new JButton("Submit");
+		btnSubmit.setEnabled(false);
 		actions.add(btnSubmit);
 		
 		JTabbedPane imageNav = new JTabbedPane(JTabbedPane.TOP);
@@ -126,7 +170,7 @@ public class Indexer {
 		JPanel imageNavPanel = new JPanel();
 		imageNav.addTab("Image Navigation", null, imageNavPanel, null);
 		
-		JTabbedPane entry = new JTabbedPane(JTabbedPane.TOP);
+		final JTabbedPane entry = new JTabbedPane(JTabbedPane.TOP);
 		bottomSplitter.setLeftComponent(entry);
 		
 		final TableEntryPane tableEntryPane = new TableEntryPane();
@@ -134,6 +178,14 @@ public class Indexer {
 		
 		final FormEntryPanel formEntryPanel = new FormEntryPanel();
 		entry.addTab("Form Entry", null, formEntryPanel, null);
+		
+		entry.addChangeListener(new ChangeListener(){
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				if (entry.getSelectedIndex() == 1)
+					formEntryPanel.youreInFocus();
+			}
+		});
 		
 		JMenuBar menuBar = new JMenuBar();
 		frame.setJMenuBar(menuBar);
@@ -159,6 +211,13 @@ public class Indexer {
 							formEntryPanel.setModel(model);
 
 							mntmDownloadBatch.setEnabled(false);
+							
+							btnZoomIn.setEnabled(true);
+							btnZoomOut.setEnabled(true);
+							btnToggleHighlights.setEnabled(true);
+							btnInvertImage.setEnabled(true);
+							btnSave.setEnabled(true);
+							btnSubmit.setEnabled(true);
 						}
 					});
 					
@@ -176,5 +235,26 @@ public class Indexer {
 		
 		JMenuItem mntmQuit = new JMenuItem("Quit");
 		mnFile.add(mntmQuit);
+	}
+	
+	public void saveState() {
+		Rectangle bounds = frame.getBounds();
+		model.setProperty("frameX", bounds.x);
+		model.setProperty("frameY", bounds.y);
+		model.setProperty("frameWidth", bounds.width);
+		model.setProperty("frameHeight", bounds.height);
+		
+		model.setProperty("mainDivider", mainSplitter.getDividerLocation());
+		model.setProperty("bottomDivider", bottomSplitter.getDividerLocation());
+		
+		try {
+			FileOutputStream fileOut = new FileOutputStream(Communicator.getUsername() + ".ser");
+			ObjectOutputStream out = new ObjectOutputStream(fileOut);
+			out.writeObject(model);
+			out.close();
+			fileOut.close();
+		} catch (IOException i) {
+			i.printStackTrace();
+		}
 	}
 }

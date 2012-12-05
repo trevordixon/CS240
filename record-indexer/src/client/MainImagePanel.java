@@ -45,7 +45,7 @@ public class MainImagePanel extends JPanel {
 			}
 		});
 		
-		this.addMouseMotionListener(new MouseMotionListener() {
+		image.addMouseMotionListener(new MouseMotionListener() {
 			int oldX = -1;
 			int oldY = -1;
 			

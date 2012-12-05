@@ -1,24 +1,41 @@
 package client;
 
+import java.io.Serializable;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import shared.Batch;
 
-public class CurrentDataModel {
-	private Set<DataListener> listeners = new HashSet<DataListener>();
-	private String[][] data;
+@SuppressWarnings("serial")
+public class CurrentDataModel implements Serializable {
 	public final Batch batch;
-	private int selectedRow = -1;
-	private int selectedCol = -1;
+
+	private transient Set<DataListener> listeners = new HashSet<DataListener>();
+	private String[][] data;
+	
+	private int selectedRow = 0;
+	private int selectedCol = 0;
+	
+	Map<String, Integer> properties = new HashMap<String, Integer>();
 	
 	public CurrentDataModel(Batch batch) {
 		this.batch = batch;
 		data = new String[batch.getProject().getRecordsperimage()][batch.getFields().size()];
+		
+		for (int row = 0; row < data.length; row++) {
+			for (int col = 0; col < data[row].length; col++) {
+				data[row][col] = "";
+			}
+		}
 	}
 	
 	public void updateData(int row, int col, String data) {
+		if (this.data[row][col].equals(data)) return;
+		
 		this.data[row][col] = data;
+
 		for (DataListener listener : listeners) {
 			listener.dataChange(row, col, data);
 		}
@@ -37,6 +54,10 @@ public class CurrentDataModel {
 		listeners.add(listener);
 	}
 	
+	public String getData(int row, int col) {
+		return data[row][col];
+	}
+	
 	public String[][] getData() {
 		String [][] dataClone = new String[data.length][];
 		
@@ -44,5 +65,21 @@ public class CurrentDataModel {
 			dataClone[i] = data[i].clone();
 
 		return dataClone;
+	}
+	
+	public int getSelectedRow() {
+		return selectedRow;
+	}
+	
+	public int getSelectedCol() {
+		return selectedCol;
+	}
+	
+	public void setProperty(String key, Integer value) {
+		properties.put(key, value);
+	}
+	
+	public Integer getProperty(String key) {
+		return properties.get(key);
 	}
 }
