@@ -161,10 +161,22 @@ public class Indexer {
 		actions.add(btnZoomOut);
 		
 		btnInvertImage = new JButton("Invert Image");
+		btnInvertImage.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				mainImagePanel.image.toggleInvert();
+			}
+		});
 		btnInvertImage.setEnabled(false);
 		actions.add(btnInvertImage);
 		
 		btnToggleHighlights = new JButton("Toggle Highlights");
+		btnToggleHighlights.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				mainImagePanel.image.toggleHighlight();
+			}
+		});
 		btnToggleHighlights.setEnabled(false);
 		actions.add(btnToggleHighlights);
 		

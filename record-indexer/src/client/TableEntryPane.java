@@ -77,7 +77,7 @@ public class TableEntryPane extends JScrollPane {
 		
 		table.setModel(tableModel);
 		
-		setSelectedCell(model.getSelectedRow(), model.getSelectedCol());
+		setSelectedCell(model.getSelectedRow(), model.getSelectedCol() + 1);
 		table.requestFocusInWindow();
 		
 		model.addListener(new DataListener() {

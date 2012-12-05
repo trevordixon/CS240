@@ -66,6 +66,7 @@ public class FormEntryPanel extends JPanel {
 			@Override
 			public void selectionChange(int row, int col) {
 				list.setSelectedIndex(row);
+				textFields[col].requestFocusInWindow();
 				loadValues();
 			}
 
