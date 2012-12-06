@@ -14,35 +14,32 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+
+import com.sun.jersey.core.util.MultivaluedMapImpl;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.Dialog.ModalityType;
+import java.util.Scanner;
 
 @SuppressWarnings("serial")
 public class Login extends JDialog {
-
 	private final JPanel contentPanel = new JPanel();
-	private JTextField textField;
+	private JTextField usernameField;
 	private JPasswordField passwordField;
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		try {
-			Login dialog = new Login();
-			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-			dialog.setVisible(true);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
+	private boolean loggedin = false;
+	
 	/**
 	 * Create the dialog.
 	 */
 	public Login() {
+		setModalityType(ModalityType.APPLICATION_MODAL);
+		setModal(true);
 		setResizable(false);
-		setBounds(100, 100, 318, 134);
+		setSize(318, 134);
+		setLocationRelativeTo(null);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
@@ -62,14 +59,14 @@ public class Login extends JDialog {
 			contentPanel.add(lblUsername, gbc_lblUsername);
 		}
 		{
-			textField = new JTextField();
+			usernameField = new JTextField();
 			GridBagConstraints gbc_textField = new GridBagConstraints();
 			gbc_textField.insets = new Insets(0, 0, 5, 0);
 			gbc_textField.fill = GridBagConstraints.HORIZONTAL;
 			gbc_textField.gridx = 1;
 			gbc_textField.gridy = 0;
-			contentPanel.add(textField, gbc_textField);
-			textField.setColumns(10);
+			contentPanel.add(usernameField, gbc_textField);
+			usernameField.setColumns(10);
 		}
 		{
 			JLabel lblPassword = new JLabel("Password:");
@@ -94,22 +91,57 @@ public class Login extends JDialog {
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
 				JButton exitButton = new JButton("Exit");
-				exitButton.setActionCommand("Exit");
+				exitButton.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						Login.this.setVisible(false);
+						Login.this.dispose();
+					}
+				});
 				buttonPane.add(exitButton);
 			}
 			{
 				JButton loginButton = new JButton("Login");
 				loginButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						//System.out.println(e.getActionCommand());
-						JOptionPane.showMessageDialog(getContentPane(), "Welcome Sheila Parker.\nYou have indexed 0 records.", "Welcome", JOptionPane.PLAIN_MESSAGE);
+						String username = usernameField.getText();
+						String password = passwordField.getText();
+						
+						MultivaluedMap formData = new MultivaluedMapImpl();
+						formData.add("username", username);
+						formData.add("password", password);
+
+						try {
+							String response = Communicator.resource.path("user/validate").type(MediaType.APPLICATION_FORM_URLENCODED).post(String.class, formData);
+							
+							Communicator.setUsernameAndPassword(username, password);
+							loggedin = true;
+							
+							Scanner sc = new Scanner(response);
+							sc.next();
+							String firstName = sc.next();
+							String lastName = sc.next();
+							String numIndexed = sc.next();
+							
+							JOptionPane.showMessageDialog(getContentPane(), "Welcome " + firstName + " " + lastName + ".\nYou have indexed " + numIndexed + " records.", "Welcome", JOptionPane.PLAIN_MESSAGE);
+							
+							Login.this.setVisible(false);
+							Login.this.dispose();
+						} catch (Exception ex) {
+							JOptionPane.showMessageDialog(getContentPane(), "Wrong username and password.", "Failed", JOptionPane.WARNING_MESSAGE);
+						}
+						
 					}
 				});
-				loginButton.setActionCommand("Login");
 				buttonPane.add(loginButton);
 				getRootPane().setDefaultButton(loginButton);
 			}
 		}
+	}
+	
+	boolean showDialog() {
+		setVisible(true);
+		return loggedin;
 	}
 
 }

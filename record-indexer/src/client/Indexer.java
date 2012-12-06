@@ -58,11 +58,20 @@ public class Indexer {
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+		String host = "localhost";
+		int port = 39640;
+		
+		if (args.length >= 2) {
+			host = args[0];
+			port = Integer.parseInt(args[1]);
+		}
+		
+		Communicator.setServer(host, port);
+		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					Indexer window = new Indexer();
-					window.frame.setVisible(true);
+					doLogin();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -70,6 +79,18 @@ public class Indexer {
 		});
 	}
 
+	public static void doLogin() {
+		Login login = new Login();
+		boolean loggedin = login.showDialog();
+		
+		if (loggedin) {
+			Indexer window = new Indexer();
+			window.frame.setVisible(true);
+		} else {
+			System.exit(0);
+		}
+	}
+	
 	/**
 	 * Create the application.
 	 */
@@ -261,9 +282,27 @@ public class Indexer {
 		});
 		
 		JMenuItem mntmLogout = new JMenuItem("Logout");
+		mntmLogout.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				saveState();
+				Communicator.clearCredentials();
+				frame.setVisible(false);
+				frame.dispose();
+				doLogin();
+			}
+		});
 		mnFile.add(mntmLogout);
 		
 		JMenuItem mntmQuit = new JMenuItem("Quit");
+		mntmQuit.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				frame.setVisible(false);
+				frame.dispose();
+				System.exit(0);
+			}
+		});
 		mnFile.add(mntmQuit);
 		
 		if (model.getBatch() != null) loadBatch();
