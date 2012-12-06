@@ -288,20 +288,20 @@ public class Indexer {
 		});
 		
 		// Detect application quitting on OS X
-		try {
-			Class.forName(com.apple.eawt.Application.class.getName());
-
-			com.apple.eawt.Application app = com.apple.eawt.Application.getApplication();
-			app.setQuitHandler(new com.apple.eawt.QuitHandler() {
-				@Override
-				public void handleQuitRequestWith(com.apple.eawt.AppEvent.QuitEvent qe, com.apple.eawt.QuitResponse qr) {
-					saveState();
-					qr.performQuit();
-				}
-			});
-		} catch (ClassNotFoundException e1) {
-			// Not on OS X, ignore
-		}
+//		try {
+//			Class.forName(com.apple.eawt.Application.class.getName());
+//
+//			com.apple.eawt.Application app = com.apple.eawt.Application.getApplication();
+//			app.setQuitHandler(new com.apple.eawt.QuitHandler() {
+//				@Override
+//				public void handleQuitRequestWith(com.apple.eawt.AppEvent.QuitEvent qe, com.apple.eawt.QuitResponse qr) {
+//					saveState();
+//					qr.performQuit();
+//				}
+//			});
+//		} catch (ClassNotFoundException e1) {
+//			// Not on OS X, ignore
+//		}
 	}
 	
 	public void loadBatch() {
