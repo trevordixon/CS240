@@ -60,7 +60,8 @@ public class DownloadBatchDialog extends JDialog {
 		setModal(true);
 		setModalityType(ModalityType.APPLICATION_MODAL);
 		setResizable(false);
-		setBounds(100, 100, 389, 114);
+		setSize(389, 114);
+		setLocationRelativeTo(null);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);

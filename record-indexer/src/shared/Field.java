@@ -2,6 +2,7 @@ package shared;
 
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 
 import javax.xml.bind.annotation.*;
 
@@ -85,8 +86,8 @@ public class Field extends Item {
 		sc.close();
 	}
 	
-	public String getSuggestion(String s) {
-		if (words == null) return s;
-		return Spell.getSuggestion(s, words);
+	public Set<String> getSuggestions(String s) {
+		if (words == null) return null;
+		return Spell.getSuggestions(s, words);
 	}
 }

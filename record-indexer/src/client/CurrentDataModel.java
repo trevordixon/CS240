@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -57,7 +56,7 @@ public class CurrentDataModel implements Serializable {
 		
 		for (int row = 0; row < data.length; row++) {
 			for (int col = 0; col < data[row].length; col++) {
-				data[row][col] = new CurrentValue("");
+				data[row][col] = new CurrentValue("", col);
 			}
 		}
 		
@@ -69,17 +68,7 @@ public class CurrentDataModel implements Serializable {
 	public void updateData(int row, int col, String data) {
 		if (this.data[row][col].equals(data)) return;
 		
-		CurrentValue cv = new CurrentValue();
-		cv.value = data;
-		
-		Field field = batch.getFields().get(col);
-		List<String> suggestions = new ArrayList<String>();
-		String suggestion = field.getSuggestion(data);
-		if (suggestion == null || !data.toLowerCase().equals(suggestion.toLowerCase())) {
-			suggestions.add(suggestion);
-		}
-		cv.suggestions = suggestions;
-		
+		CurrentValue cv = new CurrentValue(data, col);
 		this.data[row][col] = cv;
 
 		for (DataListener listener : listeners) {
@@ -106,6 +95,10 @@ public class CurrentDataModel implements Serializable {
 	
 	public CurrentValue[][] getData() {
 		return data;
+	}
+	
+	public CurrentValue getSelectedData() {
+		return getData(getSelectedRow(), getSelectedCol());
 	}
 	
 	public BufferedImage getImage() {
@@ -136,7 +129,7 @@ public class CurrentDataModel implements Serializable {
 	
 	class CurrentValue implements java.io.Serializable {
 		public String value;
-		public List<String> suggestions = new ArrayList<String>();
+		public Set<String> suggestions = null;
 		
 		public CurrentValue() {
 			value = "";
@@ -146,12 +139,24 @@ public class CurrentDataModel implements Serializable {
 			this.value = value;
 		}
 		
+		public CurrentValue(String value, int col) {
+			this.value = value;
+			Field field = batch.getFields().get(col);
+			suggestions = field.getSuggestions(value);
+
+		}
+		
 		public boolean equals(String s) {
 			return value.equals(s);
 		}
 		
 		public boolean equals(CurrentValue cv) {
 			return value.equals(cv.value);
+		}
+		
+		@Override
+		public String toString() {
+			return value;
 		}
 	}
 }

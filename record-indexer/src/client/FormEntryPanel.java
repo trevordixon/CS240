@@ -10,6 +10,8 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.List;
 
 import javax.swing.JList;
@@ -28,6 +30,8 @@ public class FormEntryPanel extends JPanel {
 	JList<String> list = new JList<String>();
 	JPanel formPanel;
 	JTextField[] textFields;
+	SuggestionPopup popupMenu = new SuggestionPopup();
+	
 	
 	/**
 	 * Create the panel.
@@ -39,6 +43,7 @@ public class FormEntryPanel extends JPanel {
 		
 		formPanel = new JPanel();
 		add(formPanel, BorderLayout.CENTER);
+		
 		formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
 	}
 
@@ -53,6 +58,8 @@ public class FormEntryPanel extends JPanel {
 		for (int i = 0; i < project.getRecordsperimage(); i++) {
 			listModel.addElement(Integer.toString(i+1) + "               ");
 		}
+		
+		popupMenu.setModel(model);
 		
 		list.setModel(listModel);
 		list.setSelectedIndex(model.getSelectedRow());
@@ -87,13 +94,50 @@ public class FormEntryPanel extends JPanel {
 			
 			JLabel label = new JLabel(field.getTitle());
 			label.setSize(120, 20);
+			//label.setSize(label.getWidth(), 20);
 			horizLayout.add(label);
 			
-			textFields[col] = new HighlightTextField();
-			label.setSize(label.getWidth(), 20);
-			textFields[col].setColumns(10);
-			textFields[col].addFocusListener(new FormTextFieldFocusListener(col, model));
-			textFields[col].addKeyListener(new FormTextFieldChangeListener(col, model));
+			JTextField tf = textFields[col] = new HighlightTextField();
+			tf.setColumns(10);
+			tf.addFocusListener(new FormTextFieldFocusListener(col, model));
+			tf.addKeyListener(new FormTextFieldChangeListener(col, model));
+			
+			tf.setComponentPopupMenu(popupMenu);
+			final int closeCol = col;
+			tf.addMouseListener(new MouseListener(){
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					textFields[closeCol].requestFocusInWindow();
+					model.changeSelection(model.getSelectedRow(), closeCol);
+					popupMenu.refresh();
+				}
+
+				@Override
+				public void mousePressed(MouseEvent e) {
+					textFields[closeCol].requestFocusInWindow();
+					model.changeSelection(model.getSelectedRow(), closeCol);
+					popupMenu.refresh();
+				}
+
+				@Override
+				public void mouseReleased(MouseEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void mouseEntered(MouseEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void mouseExited(MouseEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+			});
+
 			if (model.getSelectedCol() == col) textFields[col].requestFocusInWindow();
 			
 			horizLayout.add(textFields[col]);
@@ -109,7 +153,7 @@ public class FormEntryPanel extends JPanel {
 			CurrentValue cv = model.getData(model.getSelectedRow(), col);
 			textFields[col].setText(cv.value);
 			
-			if (cv.suggestions.size() > 0)
+			if (cv.suggestions != null)
 				textFields[col].setBackground(new Color(250, 170, 170));
 			else
 				textFields[col].setBackground(Color.WHITE);

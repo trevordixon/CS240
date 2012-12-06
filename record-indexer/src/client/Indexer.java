@@ -96,17 +96,24 @@ public class Indexer {
 		boolean saved = model != null;
 		if (!saved) model = new CurrentDataModel();
 		
-		Rectangle bounds;
-		if (saved) bounds = new Rectangle(
-			(Integer) model.getProperty("frameX"),
-			(Integer) model.getProperty("frameY"),
-			(Integer) model.getProperty("frameWidth"),
-			(Integer) model.getProperty("frameHeight")
-		);
-		else bounds = new Rectangle(300, 300, 800, 600);
-		
 		frame = new JFrame();
-		frame.setBounds(bounds);
+
+		if (saved) {
+			Rectangle bounds = new Rectangle(
+				(Integer) model.getProperty("frameX"),
+				(Integer) model.getProperty("frameY"),
+				(Integer) model.getProperty("frameWidth"),
+				(Integer) model.getProperty("frameHeight")
+			);
+			 
+			frame.setBounds(bounds);
+
+		}
+		else {
+			frame.setSize(800, 600);
+			frame.setLocationRelativeTo(null);
+		}
+		
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{0, 0};

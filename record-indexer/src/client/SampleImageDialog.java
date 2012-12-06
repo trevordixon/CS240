@@ -48,7 +48,8 @@ public class SampleImageDialog extends JDialog {
 		setTitle("Sample image from " + project.getTitle());
 		setModalityType(ModalityType.APPLICATION_MODAL);
 		setAlwaysOnTop(true);
-		setBounds(100, 100, 640, 480);
+		setSize(640, 480);
+		setLocationRelativeTo(null);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setLayout(new FlowLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));

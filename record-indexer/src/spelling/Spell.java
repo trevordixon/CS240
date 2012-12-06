@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class Spell {
 	public static String[] deletions(String word) {
@@ -34,7 +35,6 @@ public class Spell {
 			for (letter l : letter.values()) {
 				String c = l.toString().toLowerCase();
 				if (currentLetter.equalsIgnoreCase(c)) continue;
-				//if (letter.valueOf(currentLetterChar) == null) continue;
 				words[i * (letter.values().length) + j++] = word.substring(0, i) + c + word.substring(i+1);
 			}
 			
@@ -119,6 +119,38 @@ public class Spell {
 		}
 		
 		return suggestion;
+	}
+	
+	public static Set<String> getSuggestions(String word, Words words) {
+		word = word.toLowerCase();
+		if (word.equals("") || word == null) return null;
+		if (words.find(word) != null) {
+			return null;
+		}
+		
+		Set<String> suggestions = new TreeSet<String>();
+		
+		WordNode n;
+		Set<String> words1 = oneEditDistance(word);
+		for (String s : words1) {
+			n = words.find(s);
+			if (n != null) {
+				suggestions.add(capitalize(s));
+			}
+		}
+		
+		for (String s : oneEditDistance(words1)) {
+			n = words.find(s);
+			if (n != null) {
+				suggestions.add(capitalize(s));
+			}
+		}
+		
+		return suggestions;
+	}
+	
+	private static String capitalize(String line) {
+		return Character.toUpperCase(line.charAt(0)) + line.substring(1);
 	}
 	
 	public static void main(String[] args) {
