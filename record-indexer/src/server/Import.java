@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +14,7 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -49,7 +53,7 @@ public class Import {
 		}
 	}
 	
-	private static void importProjects() {
+	private static void importProjects() throws DOMException, IOException {
 		NodeList projects = doc.getElementsByTagName("project");
 		
 		for (int i = 0; i < projects.getLength(); i++) {
@@ -83,7 +87,7 @@ public class Import {
 		}
 	}
 	
-	private static void importFields(Node _fields, int projectid) {
+	private static void importFields(Node _fields, int projectid) throws DOMException, IOException {
 		NodeList fields = _fields.getChildNodes();
 		
 		for (int i = 0; i < fields.getLength(); i++) {
@@ -98,6 +102,19 @@ public class Import {
 			for (int j = 0; j < properties.getLength(); j++) {
 				Node property = properties.item(j);
 				if (property.getNodeName().equals("#text")) continue;
+				
+				if (property.getNodeName().equals("knowndata")) {
+					String data = getFile(property.getTextContent());
+					values.put(property.getNodeName(), data);
+					continue;
+				}
+				
+				if (property.getNodeName().equals("helphtml")) {
+					String html = getFile(property.getTextContent());
+					values.put(property.getNodeName(), html);
+					continue;
+				}
+
 				
 				values.put(property.getNodeName(), property.getTextContent());
 			}
@@ -147,8 +164,6 @@ public class Import {
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
-
-					//System.out.println();
 				}
 			}
 			
@@ -187,6 +202,19 @@ public class Import {
 			ycoord += recordHeight;
 			
 		}
+	}
+	
+	private static String getFile(String path) throws IOException {
+		String absPath = new File(docPath).getAbsoluteFile().getParentFile().getAbsolutePath() + File.separator + path;
+		
+		FileInputStream stream = new FileInputStream(new File(absPath));
+		try {
+			FileChannel fc = stream.getChannel();
+			MappedByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
+			return Charset.defaultCharset().decode(bb).toString();
+		} finally {
+		  stream.close();
+	  }
 	}
 	
 	public static void main(String[] args) throws SAXException, IOException, ParserConfigurationException {

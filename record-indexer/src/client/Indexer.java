@@ -42,7 +42,8 @@ public class Indexer {
 	private MainImagePanel mainImagePanel;
 	private TableEntryPane tableEntryPane;
 	private FormEntryPanel formEntryPanel;
-
+	private ImageNav imageNavPanel;
+	
 	private JMenuItem mntmDownloadBatch;
 	
 	private JButton btnZoomIn;
@@ -199,7 +200,7 @@ public class Indexer {
 		JPanel fieldHelpPanel = new JPanel();
 		imageNav.addTab("Field Help", null, fieldHelpPanel, null);
 		
-		JPanel imageNavPanel = new JPanel();
+		imageNavPanel = new ImageNav();
 		imageNav.addTab("Image Navigation", null, imageNavPanel, null);
 		
 		imageNav.setSelectedIndex(1);
@@ -238,8 +239,7 @@ public class Indexer {
 						// CallBack when an image is downloaded
 						@Override
 						public void callBack(Batch batch) {
-							model.setBatch(batch);
-							
+							model.loadBatch(batch);
 							loadBatch();
 						}
 					});
@@ -280,7 +280,7 @@ public class Indexer {
 			public void windowDeactivated(WindowEvent e) { }
 		});
 		
-		
+		// Detect application quitting on OS X
 		try {
 			Class.forName(com.apple.eawt.Application.class.getName());
 
@@ -301,7 +301,8 @@ public class Indexer {
 		mainImagePanel.setModel(model);
 		tableEntryPane.setModel(model);
 		formEntryPanel.setModel(model);
-
+		imageNavPanel.setModel(model);
+		
 		mntmDownloadBatch.setEnabled(false);
 		
 		btnZoomIn.setEnabled(true);

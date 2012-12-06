@@ -1,3 +1,4 @@
+package spelling;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashSet;
@@ -22,26 +23,33 @@ public class Spell {
 	}
 	
 	public static String[] alterations(String word) {
-		String[] words = new String[word.length() * 25];
-		for (int i = 0; i < word.length(); i++) {
-			String currentLetter = Character.toString(word.charAt(i));
+		String[] words = new String[word.length() * (letter.values().length)];
+		
+		char[] letters = word.toCharArray();
+		int i = 0;
+		for (char currentLetterChar : letters) {
+			String currentLetter = Character.toString(currentLetterChar);
+			
 			int j = 0;
 			for (letter l : letter.values()) {
 				String c = l.toString().toLowerCase();
 				if (currentLetter.equalsIgnoreCase(c)) continue;
-				words[i * 25 + j++] = word.substring(0, i) + c + word.substring(i+1);
+				//if (letter.valueOf(currentLetterChar) == null) continue;
+				words[i * (letter.values().length) + j++] = word.substring(0, i) + c + word.substring(i+1);
 			}
+			
+			i++;
 		}
 		return words;
 	}
 	
 	public static String[] insertions(String word) {
-		String[] words = new String[(word.length() + 1) * 26];
+		String[] words = new String[(word.length() + 1) * (letter.values().length)];
 		for (int i = 0; i <= word.length(); i++) {
 			int j = 0;
 			for (letter l : letter.values()) {
 				String c = l.toString().toLowerCase();
-				words[i * 26 + j++] = word.substring(0, i) + c + word.substring(i);
+				words[i * (letter.values().length) + j++] = word.substring(0, i) + c + word.substring(i);
 			}
 		}
 		return words;
@@ -62,6 +70,7 @@ public class Spell {
 		Set<String> words = new HashSet<String>();
 		
 		for (String word : origWords) {
+			if (word == null) continue;
 			if (word.equals("")) continue;
 			for (String s : oneEditDistance(word)) {
 				words.add(s);

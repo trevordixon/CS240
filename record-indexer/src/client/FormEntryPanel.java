@@ -5,6 +5,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
@@ -14,6 +15,7 @@ import java.util.List;
 import javax.swing.JList;
 
 import shared.*;
+import client.CurrentDataModel.CurrentValue;
 
 import javax.swing.JTextField;
 import javax.swing.BoxLayout;
@@ -71,12 +73,12 @@ public class FormEntryPanel extends JPanel {
 			}
 
 			@Override
-			public void dataChange(int row, int col, String data) {
-				// TODO Auto-generated method stub
+			public void dataChange(int row, int col, CurrentValue data) {
+				if (model.getSelectedRow() == row) textFields[col].setBackground(Color.WHITE);
 			}
 		});
 		
-		textFields = new JTextField[fields.size()];
+		textFields = new HighlightTextField[fields.size()];
 		int col = 0;
 		for (Field field : model.getBatch().getFields()) {
 			JPanel horizLayout = new JPanel();
@@ -87,7 +89,7 @@ public class FormEntryPanel extends JPanel {
 			label.setSize(120, 20);
 			horizLayout.add(label);
 			
-			textFields[col] = new JTextField();
+			textFields[col] = new HighlightTextField();
 			label.setSize(label.getWidth(), 20);
 			textFields[col].setColumns(10);
 			textFields[col].addFocusListener(new FormTextFieldFocusListener(col, model));
@@ -104,7 +106,13 @@ public class FormEntryPanel extends JPanel {
 	
 	private void loadValues() {
 		for (int col = 0; col < textFields.length; col++) {
-			textFields[col].setText(model.getData(model.getSelectedRow(), col));
+			CurrentValue cv = model.getData(model.getSelectedRow(), col);
+			textFields[col].setText(cv.value);
+			
+			if (cv.suggestions.size() > 0)
+				textFields[col].setBackground(new Color(250, 170, 170));
+			else
+				textFields[col].setBackground(Color.WHITE);
 		}
 	}
 	

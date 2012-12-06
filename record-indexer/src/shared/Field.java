@@ -1,7 +1,12 @@
 package shared;
 
 import java.util.Map;
+import java.util.Scanner;
+
 import javax.xml.bind.annotation.*;
+
+import spelling.Spell;
+import spelling.Words;
 
 @SuppressWarnings("serial")
 @XmlRootElement(name = "field")
@@ -49,5 +54,39 @@ public class Field extends Item {
 	@XmlElement
 	public String getHelphtml() {
 		return properties.get("helphtml");
+	}
+	
+	public void setHelphtml(String helphtml) {
+		properties.put("helphtml", helphtml);
+	}
+	
+	@XmlElement
+	public String getKnowndata() {
+		return properties.get("knowndata");
+	}
+	
+	public void setKnowndata(String knowndata) {
+		properties.put("knowndata", knowndata);
+	}
+	
+	private Words words;
+	public void parseKnownData() {
+		String data = getKnowndata();
+		
+		if (data == null) return;
+		
+		words = new Words();
+		Scanner sc = new Scanner(data);
+		sc.useDelimiter(",");
+		while (sc.hasNext()) {
+			String word = sc.next();
+			words.add(word);
+		}
+		sc.close();
+	}
+	
+	public String getSuggestion(String s) {
+		if (words == null) return s;
+		return Spell.getSuggestion(s, words);
 	}
 }

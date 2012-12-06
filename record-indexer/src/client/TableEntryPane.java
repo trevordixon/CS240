@@ -11,6 +11,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 import shared.*;
+import client.CurrentDataModel.CurrentValue;
 
 @SuppressWarnings("serial")
 public class TableEntryPane extends JScrollPane {
@@ -53,11 +54,11 @@ public class TableEntryPane extends JScrollPane {
 			data[row][0] = new Integer(row + 1).toString();
 		}
 		
-		String[][] initData = model.getData();
+		CurrentValue[][] initData = model.getData();
 		// Populate data
 		for (int row = 0; row < initData.length; row++) {
 			for (int col = 0; col < initData[row].length; col++) {
-				data[row][col+1] = initData[row][col];
+				data[row][col+1] = initData[row][col].value;
 			}
 		}
 		
@@ -88,8 +89,8 @@ public class TableEntryPane extends JScrollPane {
 			}
 
 			@Override
-			public void dataChange(int row, int col, String data) {
-				table.setValueAt(data, row, col+1);
+			public void dataChange(int row, int col, CurrentValue data) {
+				table.setValueAt(data.value, row, col+1);
 			}
 		});
 	}
