@@ -22,6 +22,7 @@ public class SuggestionDialog extends JDialog {
 	private final int col;
 
 	public SuggestionDialog(final CurrentDataModel model) {
+		setResizable(false);
 		row = model.getSelectedRow();
 		col = model.getSelectedCol();
 		
