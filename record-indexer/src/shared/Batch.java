@@ -28,6 +28,14 @@ public class Batch extends Item {
 		data = b;
 	}
 	
+	public void setId(Integer id) {
+		properties.put("rowid", id.toString());
+	}
+	
+	public void setId(String id) {
+		properties.put("rowid", id);
+	}
+	
 	@XmlElement
 	public Project getProject() {
 		return project;
@@ -64,6 +72,19 @@ public class Batch extends Item {
 	
 	public void setUrl(String url) {
 		this.url = url;
+	}
+	
+	@XmlElement
+	public String getImageid() {
+		return properties.get("imageid");
+	}
+	
+	public void setImageid(String imageid) {
+		properties.put("imageid", imageid);
+	}
+	
+	public void setImageid(Integer imageid) {
+		properties.put("imageid", imageid.toString());
 	}
 	
 	@Override

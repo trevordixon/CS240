@@ -2,6 +2,9 @@ package servertester.controllers;
 
 import java.util.*;
 
+import javax.ws.rs.core.MediaType;
+
+import client.Communicator;
 import client.server_communicator.HTTP;
 import client.server_communicator.ReqRes;
 
@@ -107,7 +110,8 @@ public class Controller implements IController {
 	
 	private void getReady() {
 		guiParams = getView().getParameterValues();
-		client = new HTTP(getView().getHost(), Integer.parseInt(getView().getPort()));
+		Communicator.setServer(getView().getHost(), Integer.parseInt(getView().getPort()));
+		Communicator.setUsernameAndPassword(guiParams[0], guiParams[1]);
 	}
 	
 	private void displayResults(ReqRes reqres) {
@@ -208,15 +212,13 @@ public class Controller implements IController {
 		getReady();
 		
 		Map<String, String> params = new HashMap<String, String>() {{
-			put("username", guiParams[0]);
-			put("password", guiParams[1]);
 			put("fields", guiParams[2]);
 			put("search_values", guiParams[3]);
 		}};
 		
-		String endpoint = "batch/search";
-		ReqRes reqres = client.post(endpoint, params);
-		
+		String response = Communicator.resource.path("batch/search").type(MediaType.APPLICATION_FORM_URLENCODED).accept(MediaType.TEXT_PLAIN).post(String.class, params);
+		getView().setResponse(response);
+
 		displayResults(reqres);
 	}
 

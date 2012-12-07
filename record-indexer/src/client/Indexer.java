@@ -29,13 +29,18 @@ import javax.swing.JMenuItem;
 import javax.swing.Box;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 import shared.Batch;
 
 import client.listeners.DownloadListener;
 
 public class Indexer {
-
+	private static Indexer window;
+	
 	private JFrame frame;
 	private CurrentDataModel model;
 	private JSplitPane mainSplitter;
@@ -89,7 +94,7 @@ public class Indexer {
 		boolean loggedin = login.showDialog();
 		
 		if (loggedin) {
-			Indexer window = new Indexer();
+			window = new Indexer();
 			window.frame.setVisible(true);
 		} else {
 			System.exit(0);
@@ -228,7 +233,25 @@ public class Indexer {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String dataString = model.getDataString();
-				Communicator.resource.path("submit");
+				
+				try {
+					MultivaluedMap formData = new MultivaluedMapImpl();
+					System.out.println(model.getBatch().getImageid());
+					
+					formData.add("batch", model.getBatch().getImageid());
+					formData.add("record_values", dataString);
+
+					String response = Communicator.resource.path("batch/submit").type(MediaType.APPLICATION_FORM_URLENCODED).post(String.class, formData);
+					Communicator.resource.path("submit");
+					model.unloadBatch();
+					saveState();
+					
+					window.frame.dispose();
+					Indexer window = new Indexer();
+					window.frame.setVisible(true);
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
 			}
 		});
 		btnSubmit.setEnabled(false);

@@ -79,7 +79,9 @@ public class Images {
 	public String getBatch(@FormParam("projectid") Integer projectid, @FormParam("username") String username, @Context HttpContext context) {
 		List<String> response = new ArrayList<String>();
 		
-		if (projectid == null) throw new BadParameterException();
+		if (projectid == null) {
+			throw new BadParameterException();
+		}
 		
 		try {
 			String baseUri = context.getRequest().getBaseUri().toString();
@@ -123,12 +125,19 @@ public class Images {
 	public String submitBatch(@FormParam("batch") Integer imageid, @FormParam("record_values") String _values, @Context HttpContext context, @Context SecurityContext sc) {
 		String username = sc.getUserPrincipal().getName();
 		
-		if (imageid == null || _values == null) throw new BadParameterException();
+		if (imageid == null || _values == null) {
+			System.out.println("imageid: " + imageid);
+			System.out.println("_values: " + _values);
+			throw new BadParameterException();
+		}
 			
 		try {
 			Map<String, String> imageInfo = DB.get("SELECT * FROM images WHERE rowid = ?", imageid).get(0);
 			Integer projectid = Integer.parseInt(imageInfo.get("projectid"));
-			if (!imageInfo.get("username").equals(username)) throw new BadParameterException();
+			if (!imageInfo.get("username").equals(username)) {
+				System.out.println(imageInfo.get("username") + "   " + username);
+				throw new BadParameterException();
+			}
 		
 			List<Map<String, String>> fields = DB.get("SELECT rowid,* FROM fields WHERE projectid = ? ORDER BY rowid ASC", projectid);
 			Map<String, String> projectInfo = DB.get("SELECT * FROM projects WHERE rowid = ?", projectid).get(0);
@@ -137,8 +146,14 @@ public class Images {
 			int recordheight = Integer.parseInt(projectInfo.get("recordheight"));
 			int numberValues = fields.size() * recordsperimage;
 			
-			String[] values = _values.split(",");
-			if (values.length != numberValues) throw new BadParameterException();
+			String[] values = _values.split(",", -1);
+			if (values.length != numberValues) {
+				System.out.println(values.length + "   " + numberValues);
+				System.out.println(values);
+				System.out.println(_values);
+				
+				throw new BadParameterException();
+			}
 			for (int i = 0, f = 0, r = 0; i < numberValues; i++) {
 				Map<String, String> properties = new HashMap<String, String>();
 				properties.put("fieldid", fields.get(f).get("rowid"));
@@ -156,8 +171,9 @@ public class Images {
 
 			DB.run("UPDATE images SET username = '' WHERE rowid = ?", imageid);
 			return "TRUE\n";
-		} catch (Exception e) {
-			throw new BadParameterException();
+		} catch (BadParameterException e) {
+			e.printStackTrace();
+			throw e;
 		}
 	}
 	

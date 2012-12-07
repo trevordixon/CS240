@@ -65,6 +65,14 @@ public class CurrentDataModel implements Serializable {
 		}
 	}
 	
+	public void unloadBatch() {
+		this.batch = null;
+		this.image = null;
+		this.listeners = new HashSet<DataListener>();
+		this.data = null;
+		this.selectedRow = this.selectedCol = 0;
+	}
+	
 	public void updateData(int row, int col, String data) {
 		if (this.data[row][col].equals(data)) return;
 		

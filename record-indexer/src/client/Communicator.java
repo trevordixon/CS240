@@ -10,7 +10,7 @@ import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 public class Communicator {
 	private static String username;
 	private static Client c = Client.create();
-	static WebResource resource = c.resource("http://localhost:39640");
+	public static WebResource resource = c.resource("http://localhost:39640");
 
 	public static void setServer(String host, int port) {
 		resource = c.resource("http://" + host + ":" + port);
