@@ -80,7 +80,7 @@ public class Field extends Item {
 		Scanner sc = new Scanner(data);
 		sc.useDelimiter(",");
 		while (sc.hasNext()) {
-			String word = sc.next();
+			String word = sc.next().replace("\n", "").replace("\r", "");
 			words.add(word);
 		}
 		sc.close();

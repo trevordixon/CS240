@@ -154,37 +154,7 @@ public class Spell {
 	}
 	
 	public static void main(String[] args) {
-		String filePath = args[0],
-			word = (args.length > 1) ? args[1] : "";
-		
-		Scanner sc = null;
-		
-		try {
-			sc = new Scanner(new File(filePath));
-		} catch (FileNotFoundException e) {
-			System.err.println("Dictionary file not found.");
-			return;
-		}
-		
-		try {
-			Words dict = new Words();
-			while (sc.hasNext()) {
-				String s = sc.next();
-				if (s.matches("[A-Za-z]*"))
-					dict.add(s);
-			}
-			sc.close();
-			
-			String suggestion = getSuggestion(word, dict);
-			if (suggestion == null) {
-				System.out.println("No Suggestions!");
-			} else {
-				System.out.println(suggestion);
-			}
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println("The word must be a sequence of 0 or more letters");
-		}
+		Words dict = new Words();
+		dict.add("W --!");
 	}
 }
