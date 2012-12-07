@@ -113,6 +113,33 @@ public class CurrentDataModel implements Serializable {
 		return selectedCol;
 	}
 	
+	public String getDataString() {
+		String[] vals = new String[data.length * data[0].length];
+		
+		int i = 0;
+		for (CurrentValue[] row : data) {
+			for (CurrentValue cv : row) {
+				vals[i++] = cv.value;
+			}
+		}
+		
+		return join(vals, ",");
+	}
+	
+	private String join(String[] s, String glue) {
+		int k = s.length;
+		if (k == 0)
+			return null;
+		StringBuilder out = new StringBuilder();
+		out.append(s[0]);
+		
+		for (int x = 1; x < k; ++x)
+			out.append(glue).append(s[x]);
+		
+		return out.toString();
+	}
+
+	
 	public void setProperty(String key, Object value) {
 		properties.put(key, value);
 	}

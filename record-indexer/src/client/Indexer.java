@@ -22,6 +22,7 @@ import java.io.ObjectOutputStream;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JEditorPane;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -53,6 +54,7 @@ public class Indexer {
 	private JButton btnSave;
 	private JButton btnSubmit;
 
+	private HelpPane helpPane;
 	
 	/**
 	 * Launch the application.
@@ -80,6 +82,9 @@ public class Indexer {
 	}
 
 	public static void doLogin() {
+//		Indexer win = new Indexer();
+//		win.frame.setVisible(true);
+
 		Login login = new Login();
 		boolean loggedin = login.showDialog();
 		
@@ -219,14 +224,21 @@ public class Indexer {
 		actions.add(btnSave);
 		
 		btnSubmit = new JButton("Submit");
+		btnSubmit.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String dataString = model.getDataString();
+				Communicator.resource.path("submit");
+			}
+		});
 		btnSubmit.setEnabled(false);
 		actions.add(btnSubmit);
 		
 		JTabbedPane imageNav = new JTabbedPane(JTabbedPane.TOP);
 		bottomSplitter.setRightComponent(imageNav);
 		
-		JPanel fieldHelpPanel = new JPanel();
-		imageNav.addTab("Field Help", null, fieldHelpPanel, null);
+		helpPane = new HelpPane();
+		imageNav.addTab("Field Help", null, helpPane, null);
 		
 		imageNavPanel = new ImageNav();
 		imageNav.addTab("Image Navigation", null, imageNavPanel, null);
@@ -348,6 +360,8 @@ public class Indexer {
 		tableEntryPane.setModel(model);
 		formEntryPanel.setModel(model);
 		imageNavPanel.setModel(model);
+		
+		helpPane.setModel(model);
 		
 		mntmDownloadBatch.setEnabled(false);
 		

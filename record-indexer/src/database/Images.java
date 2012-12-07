@@ -62,7 +62,7 @@ public class Images {
 		
 		Map<String, String> result = DB.get("SELECT images.rowid AS imageid, * FROM projects, images WHERE projects.rowid = images.projectid AND projectid = ? AND username IS NULL", projectid).get(0);
 		String[] values = {username, result.get("imageid")};
-//		DB.run("UPDATE images SET username = ? WHERE rowid = ?", values);
+		DB.run("UPDATE images SET username = ? WHERE rowid = ?", values);
 
 		Batch batch = new Batch(result);
 		List<Field> fields = Fields.get(Integer.parseInt(projectid));
@@ -86,7 +86,7 @@ public class Images {
 			
 			Map<String, String> image = DB.get("SELECT images.rowid AS imageid, * FROM projects, images WHERE projects.rowid = images.projectid AND projectid = ? AND username IS NULL", projectid).get(0);
 			String[] values = {username, image.get("imageid")};
-//			DB.run("UPDATE images SET username = ? WHERE rowid = ?", values);
+			DB.run("UPDATE images SET username = ? WHERE rowid = ?", values);
 			
 			response.add(image.get("imageid"));
 			response.add(String.valueOf(projectid));
@@ -120,7 +120,9 @@ public class Images {
 	@POST
 	@Path("submit")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String submitBatch(@FormParam("batch") Integer imageid, @FormParam("record_values") String _values, @FormParam("username") String username) {
+	public String submitBatch(@FormParam("batch") Integer imageid, @FormParam("record_values") String _values, @Context HttpContext context, @Context SecurityContext sc) {
+		String username = sc.getUserPrincipal().getName();
+		
 		if (imageid == null || _values == null) throw new BadParameterException();
 			
 		try {
