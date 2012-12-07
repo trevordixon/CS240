@@ -3,6 +3,9 @@ package servertester.controllers;
 import java.util.*;
 
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 import client.Communicator;
 import client.server_communicator.HTTP;
@@ -215,8 +218,13 @@ public class Controller implements IController {
 			put("fields", guiParams[2]);
 			put("search_values", guiParams[3]);
 		}};
+
+		MultivaluedMap formData = new MultivaluedMapImpl();
+		formData.add("fields", guiParams[2]);
+		formData.add("search_values", guiParams[3]);
+
 		
-		String response = Communicator.resource.path("batch/search").type(MediaType.APPLICATION_FORM_URLENCODED).accept(MediaType.TEXT_PLAIN).post(String.class, params);
+		String response = Communicator.resource.path("batch/search").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).accept(MediaType.TEXT_PLAIN).post(String.class, formData);
 		getView().setResponse(response);
 
 		displayResults(reqres);
