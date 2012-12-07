@@ -12,6 +12,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.JList;
 import java.awt.GridLayout;
 import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
 
 @SuppressWarnings("serial")
 public class SuggestionDialog extends JDialog {
@@ -40,6 +41,7 @@ public class SuggestionDialog extends JDialog {
 			contentPanel.add(scrollPane);
 			{
 				list = new JList(model.getSelectedData().suggestions.toArray());
+				list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 				scrollPane.setViewportView(list);
 			}
 		}
