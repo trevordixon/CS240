@@ -63,6 +63,8 @@ public class MainImagePanel extends JPanel {
 				
 				model.setProperty("imageX", imageX);
 				model.setProperty("imageY", imageY);
+				
+				MainImagePanel.this.calculateViewportPercent();
 			}
 
 			@Override
@@ -76,11 +78,36 @@ public class MainImagePanel extends JPanel {
 		this.addMouseWheelListener(new MouseWheelListener() {
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
-				if (e.getWheelRotation() < 0) image.zoomIn();
-				else if (e.getWheelRotation() > 0) image.zoomOut();
+				if (e.getWheelRotation() < 0) {
+					image.zoomIn();
+					MainImagePanel.this.calculateViewportPercent();
+				}
+				else if (e.getWheelRotation() > 0) {
+					image.zoomOut();
+					MainImagePanel.this.calculateViewportPercent();
+				}
 			}
 		});
 		
+	}
+	
+	public void calculateViewportPercent() {
+		int imageX = image.getX();
+		int imageY = image.getY();
+		
+		double panelWidth = MainImagePanel.this.getWidth();
+		double panelHeight = MainImagePanel.this.getHeight();
+		double imageWidth = image.getWidth();
+		double imageHeight = image.getHeight();
+		double imageEndX = imageX + imageWidth;
+		double imageEndY = imageY + imageHeight;
+		
+		double xStartPercent = Math.max( (0 - imageX) / imageWidth, 0);
+		double yStartPercent = Math.max( (0 - imageY) / imageHeight, 0);
+		double xEndPercent = Math.max( (imageEndX - panelWidth) / imageWidth , 0);
+		double yEndPercent = Math.max( (imageEndY - panelHeight) / imageHeight , 0);
+		
+		model.setViewportPercents(xStartPercent, yStartPercent, xEndPercent, yEndPercent);
 	}
 	
 	public void setModel(CurrentDataModel model) {

@@ -8,7 +8,6 @@ import java.awt.GridBagLayout;
 import javax.swing.JSplitPane;
 import java.awt.GridBagConstraints;
 import javax.swing.JTabbedPane;
-import javax.swing.JPanel;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -22,7 +21,6 @@ import java.io.ObjectOutputStream;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JEditorPane;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -186,6 +184,7 @@ public class Indexer {
 		btnZoomIn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				mainImagePanel.image.zoomIn();
+				mainImagePanel.calculateViewportPercent();
 			}
 		});
 		actions.add(btnZoomIn);
@@ -195,6 +194,7 @@ public class Indexer {
 		btnZoomOut.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				mainImagePanel.image.zoomOut();
+				mainImagePanel.calculateViewportPercent();
 			}
 		});
 		actions.add(btnZoomOut);

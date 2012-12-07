@@ -13,6 +13,8 @@ import java.util.Set;
 
 import javax.imageio.ImageIO;
 
+import client.listeners.ViewportPercentListener;
+
 import shared.*;
 
 @SuppressWarnings("serial")
@@ -25,6 +27,31 @@ public class CurrentDataModel implements Serializable {
 	
 	private int selectedRow = 0;
 	private int selectedCol = 0;
+	
+	double xStartPercent = 0;
+	double yStartPercent = 0;
+	double xEndPercent = 0;
+	double yEndPercent = 0;
+	
+	transient ViewportPercentListener viewportPercentListener = new ViewportPercentListener() {
+		@Override
+		public void change(double xStartPercent, double yStartPercent,
+				double xEndPercent, double yEndPercent) {
+			// TODO Auto-generated method stub
+		}  };
+	
+	public void setViewportPercents(double xStartPercent, double yStartPercent, double xEndPercent, double yEndPercent) {
+		this.xStartPercent = xStartPercent;
+		this.yStartPercent = yStartPercent;
+		this.xEndPercent = xEndPercent;
+		this.yEndPercent = yEndPercent;
+		
+		viewportPercentListener.change(xStartPercent, yStartPercent, xEndPercent, yEndPercent);
+	}
+	
+	public void setViewportPercentListener(ViewportPercentListener l) {
+		viewportPercentListener = l;
+	}
 	
 	Map<String, Object> properties = new HashMap<String, Object>();
 	
